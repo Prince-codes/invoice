@@ -1,0 +1,90 @@
+<!-- login.html (client-side auth) -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - SHANKAR SAH</title>
+    <link rel="stylesheet" href="login.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="header-bar">
+        <img src="logo.png" alt="Logo" class="logo-header">
+        <span class="company-name">SHANKAR SAH</span>
+    </div>
+    <div class="login-container">
+        <div class="icon-circle"><i class="fa fa-user"></i></div>
+        <h2>Login</h2>
+        <input type="text" id="username" placeholder="Username" />
+        <div class="password-wrapper">
+            <input type="password" id="password" placeholder="Password" />
+            <button type="button" id="togglePassword" class="toggle-password"><i class="fa fa-eye"></i></button>
+        </div>
+        <button id="loginBtn">Login</button>
+        <p id="errorMsg"></p>
+    </div>
+
+<script>
+/*
+ Client-side login:
+ - Users stored in localStorage key 'users' (array of {username,password})
+ - Default user (admin/admin) is created on first load
+ - On successful login store session username in sessionStorage 'loggedInUser'
+*/
+
+(function(){
+  // ensure default user exists
+  const raw = localStorage.getItem('users');
+  if (!raw) {
+    const defaultUsers = [{ username: 'admin', password: 'admin' }];
+    localStorage.setItem('users', JSON.stringify(defaultUsers));
+  }
+
+  const loginBtn = document.getElementById('loginBtn');
+  const err = document.getElementById('errorMsg');
+
+  loginBtn.addEventListener('click', () => {
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+    err.innerText = '';
+
+    if (!username || !password) { err.innerText = 'Enter username and password.'; return; }
+
+    let users = [];
+    try { users = JSON.parse(localStorage.getItem('users') || '[]'); } catch(e) { users = []; }
+
+    const found = users.find(u => u.username === username && u.password === password);
+    if (found) {
+      // store session
+      sessionStorage.setItem('loggedInUser', username);
+      // redirect to main
+      window.location.href = 'main.html';
+    } else {
+      err.innerText = 'Invalid credentials.';
+    }
+  });
+
+  // Toggle password visibility
+  document.getElementById("togglePassword").addEventListener("click", function() {
+    const pwd = document.getElementById("password");
+    const icon = this.querySelector("i");
+    if (pwd.type === "password") {
+      pwd.type = "text";
+      icon.classList.remove("fa-eye");
+      icon.classList.add("fa-eye-slash");
+    } else {
+      pwd.type = "password";
+      icon.classList.remove("fa-eye-slash");
+      icon.classList.add("fa-eye");
+    }
+  });
+
+  // allow Enter key to submit
+  document.getElementById('password').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') loginBtn.click();
+  });
+
+})();
+</script>
+</body>
+</html>

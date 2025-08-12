@@ -1,0 +1,233 @@
+/* Make previous bills modal's table scrollable vertically */
+#previousBillsTable {
+    display: block;
+    max-height: 400px;
+    overflow-y: auto;
+    width: 100%;
+}
+
+#previousBillsTable thead, #previousBillsTable tbody, #previousBillsTable tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+#previousBillsTable thead {
+    width: 100%;
+}
+
+#previousBillsTable tbody {
+    display: block;
+    max-height: 350px;
+    overflow-y: auto;
+    width: 100%;
+}
+/* Responsive mobile preview */
+@media (max-width: 480px) {
+    .login-container {
+        width: 95vw;
+        padding: 24px 8px 18px 8px;
+        top: 40px;
+    }
+    .logo-header {
+        width: 48px;
+        height: 48px;
+    }
+    .company-name {
+        font-size: 1.2rem;
+    }
+    input, .login-container input {
+        font-size: 0.98rem;
+        padding: 10px 12px;
+    }
+    button {
+        font-size: 1rem;
+        padding: 10px;
+    }
+    .icon-circle {
+        width: 50px;
+        height: 50px;
+        top: -28px;
+    }
+    .toggle-password {
+        right: 8px;
+        height: 18px;
+        width: 18px;
+        font-size: 1.1rem;
+    }
+}
+/* Header bar styles */
+.header-bar {
+    position: absolute;
+    top: 32px;
+    left: 40px;
+    display: flex;
+    align-items: center;
+    z-index: 10;
+}
+.logo-header {
+    width: 70px;
+    height: 70px;
+    margin-right: 16px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+    box-shadow: 0 0 8px #00eaff44;
+}
+.company-name {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 1.2px;
+    text-shadow: 0 2px 8px #00eaff44;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background: radial-gradient(circle at 60% 40%, #1a2332 0%, #232a3a 100%);
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.login-container {
+    background: rgba(255,255,255,0.08);
+    border-radius: 18px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.18);
+    padding: 38px 28px 28px 28px;
+    width: 360px;
+    text-align: center;
+    position: relative;
+    margin: 0 auto;
+    top: 90px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+
+.logo {
+    display: none;
+}
+/* Password input and toggle styles */
+.password-wrapper {
+    position: relative;
+    width: 100%;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+}
+.password-wrapper input[type="password"],
+.password-wrapper input[type="text"] {
+    width: 100%;
+    padding-right: 44px;
+    margin: 0 auto;
+}
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 30%;
+    transform: translateY(-50%);
+    background: rgba(0,234,255,0.12);
+    border: none;
+    color: #00eaff;
+    font-size: 1.35rem;
+    cursor: pointer;
+    outline: none;
+    z-index: 2;
+    padding: 0;
+    height: 20px;
+    width: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(0,234,255,0.08);
+}
+/* Hide default button styles for toggle */
+.toggle-password:active,
+.toggle-password:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.icon-circle {
+    position: absolute;
+    top: -42px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70px;
+    height: 70px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 0 6px rgba(0,255,255,0.08), 0 0 18px 2px #00eaff;
+    border: 2px solid rgba(255,255,255,0.18);
+    z-index: 2;
+}
+
+.icon-circle i {
+    color: #00eaff;
+    font-size: 2rem;
+}
+
+
+input {
+    width: 100%;
+    padding: 12px 16px;
+    margin: 10px auto;
+    border: none;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.18);
+    color: #eaf6fb;
+    font-size: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    outline: none;
+    transition: background 0.2s;
+    box-sizing: border-box;
+    text-align: left;
+    display: block;
+}
+input:focus {
+    background: rgba(0,234,255,0.12);
+    color: #fff;
+}
+
+
+button {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(90deg, #00eaff 0%, #0078ff 100%);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: background 0.2s, box-shadow 0.2s;
+}
+button:hover {
+    background: linear-gradient(90deg, #0078ff 0%, #00eaff 100%);
+    box-shadow: 0 4px 16px rgba(0,234,255,0.18);
+}
+
+
+#errorMsg {
+    color: #ff4d4f;
+    margin-top: 12px;
+    font-size: 0.98rem;
+    letter-spacing: 0.5px;
+}
