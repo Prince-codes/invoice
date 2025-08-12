@@ -328,7 +328,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <body>
   <div class="invoice-header">
     <div style="display:flex;align-items:center;">
-      <div class="logo-wrap"><img src="/logo.png" alt="Logo"></div>
+      <div class="logo-wrap"><img src="./logo.png" alt="Logo"></div>
       <div class="company-info">
         <h1>SHANKAR SAH</h1>
         <div class="muted">Gamharia market complex - 832108</div>
