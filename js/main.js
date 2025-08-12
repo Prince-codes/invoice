@@ -166,13 +166,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const day = Number(inp.dataset.day);
       const raw = inp.value.trim();
       if (raw === '-' || raw === '') {
-        dailyRows.push({ day_num: day, date: formatISODate(y, m, day), amount: null, is_empty: true });
+        dailyRows.push({ day_num: day, date: formatISODate(y, m - 1, day), amount: null, is_empty: true });
       } else {
         const num = Number(raw);
         if (isNaN(num)) {
-          dailyRows.push({ day_num: day, date: formatISODate(y, m, day), amount: null, is_empty: true });
+          dailyRows.push({ day_num: day, date: formatISODate(y, m - 1, day), amount: null, is_empty: true });
         } else {
-          dailyRows.push({ day_num: day, date: formatISODate(y, m, day), amount: num, is_empty: false });
+          dailyRows.push({ day_num: day, date: formatISODate(y, m - 1, day), amount: num, is_empty: false });
         }
       }
     });
