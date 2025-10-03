@@ -1,12 +1,12 @@
 /* public/main.css - Matte Blue Glassmorphic Professional Theme */
 :root {
-  --primary: #1e88e5;
-  --accent: #29b6f6;
-  --muted: #b0bec5;
-  --glass: rgba(30, 136, 229, 0.08);
+  --primary: #6A00FF;
+  --accent: #00E5FF;
+  --muted: #BBBBBB;
+  --glass: rgba(255,255,255,0.08);
   --blur: 18px;
-  --radius: 16px;
-  --shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  --radius: 18px;
+  --shadow: 0 0 32px 0 rgba(161,0,255,0.18);
   --font: 'Montserrat', 'Segoe UI', Arial, sans-serif;
   font-family: var(--font);
 }
@@ -21,10 +21,10 @@ html, body {
 
 body {
   margin: 0;
-  background: radial-gradient(circle at 20% 20%, rgba(41, 182, 246, 0.12) 0%, transparent 50%),
-              radial-gradient(circle at 80% 80%, rgba(30, 136, 229, 0.08) 0%, transparent 60%),
-              linear-gradient(180deg, #0a0e14 0%, #111720 100%);
-  color: #e3f2fd;
+  background: radial-gradient(circle at 20% 20%, rgba(106,0,255,0.12) 0%, transparent 50%),
+              radial-gradient(circle at 80% 80%, rgba(0,229,255,0.08) 0%, transparent 60%),
+              linear-gradient(180deg, #0D0D0D 0%, #1a0033 100%);
+  color: #fff;
 }
 
 /* App Shell */
@@ -35,7 +35,7 @@ body {
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   backdrop-filter: blur(var(--blur));
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1.5px solid rgba(161,0,255,0.18);
 }
 
 /* Header */
@@ -46,9 +46,9 @@ body {
   gap: 16px;
   margin-bottom: 20px;
   padding: 16px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, rgba(30, 136, 229, 0.08), rgba(41, 182, 246, 0.05));
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(106,0,255,0.12), rgba(0,229,255,0.08));
+  border: 1.5px solid rgba(161,0,255,0.18);
   box-shadow: var(--shadow);
   backdrop-filter: blur(var(--blur));
 }
@@ -62,23 +62,24 @@ body {
 .logo-glow {
   width: 64px;
   height: 64px;
-  border-radius: 12px;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
   color: #fff;
   background: linear-gradient(135deg, var(--primary), var(--accent));
-  box-shadow: inset 0 0 12px rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 16px 4px rgba(161,0,255,0.18);
   font-size: 18px;
 }
 
 .brand h1 {
   margin: 0;
-  font-size: 22px;
-  letter-spacing: 1px;
-  color: var(--accent);
+  font-size: 2rem;
+  letter-spacing: 1.2px;
+  color: var(--primary);
   font-weight: 800;
+  text-shadow: 0 2px 8px #00eaff44;
 }
 
 .muted {
@@ -91,9 +92,9 @@ body {
 .card {
   margin-top: 16px;
   padding: 20px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, rgba(30, 136, 229, 0.08), rgba(41, 182, 246, 0.05));
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(106,0,255,0.12), rgba(0,229,255,0.08));
+  border: 1.5px solid rgba(161,0,255,0.18);
   box-shadow: var(--shadow);
   backdrop-filter: blur(var(--blur));
 }
@@ -118,26 +119,27 @@ label {
 }
 
 input, select {
-  padding: 10px 12px;
-  border-radius: 10px;
-  background: rgba(30, 136, 229, 0.08);
-  border: 1.5px solid rgba(255, 255, 255, 0.06);
-  box-shadow: inset 0 1px 6px rgba(0, 0, 0, 0.15);
-  color: #e3f2fd;
-  font-size: 15px;
+  padding: 13px 16px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  box-shadow: 0 2px 8px rgba(161,0,255,0.08);
+  color: #fff;
+  font-size: 1.08rem;
   outline: none;
-  transition: background 0.2s, border-color 0.2s;
+  transition: background 0.2s, box-shadow 0.2s;
   font-weight: 500;
 }
 
 select {
-  background: rgba(41, 182, 246, 0.12);
+  background: rgba(0,229,255,0.12);
   color: #fff;
 }
 
 input:focus, select:focus {
-  background: rgba(30, 136, 229, 0.14);
-  border-color: var(--accent);
+  background: rgba(161,0,255,0.12);
+  color: #fff;
+  box-shadow: 0 0 8px #A100FF;
 }
 
 /* Buttons */
@@ -149,41 +151,41 @@ input:focus, select:focus {
 }
 
 .btn {
-  padding: 10px 14px;
-  border-radius: 10px;
+  padding: 13px;
+  border-radius: 12px;
   border: none;
-  background: linear-gradient(135deg, var(--primary), var(--accent));
+  background: linear-gradient(90deg, #6A00FF 0%, #A100FF 100%);
   color: #fff;
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 700;
   outline: none;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  transition: background 0.2s, transform 0.15s;
+  border: none;
+  transition: background 0.2s, box-shadow 0.2s;
 }
 
 .btn.primary {
-  background: linear-gradient(135deg, var(--accent), var(--primary));
+  background: linear-gradient(90deg, #A100FF 0%, #6A00FF 100%);
 }
 
 .btn.primary:hover {
-  transform: translateY(-1px);
-  background: linear-gradient(135deg, var(--primary), var(--accent));
+  background: linear-gradient(90deg, #6A00FF 0%, #A100FF 100%);
+  box-shadow: 0 0 16px 4px rgba(161,0,255,0.7);
 }
 
 #viewPreviousBtn {
-  background: linear-gradient(135deg, var(--primary), var(--accent));
+  background: linear-gradient(90deg, #6A00FF 0%, #A100FF 100%);
   color: #fff;
-  font-weight: 600;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 10px 18px;
+  font-weight: 700;
+  border-radius: 12px;
+  border: none;
+  padding: 13px 18px;
   cursor: pointer;
-  transition: background 0.2s, transform 0.15s;
+  transition: background 0.2s, box-shadow 0.2s;
 }
 
 #viewPreviousBtn:hover {
-  background: linear-gradient(135deg, var(--accent), var(--primary));
-  transform: translateY(-1px);
+  background: linear-gradient(90deg, #A100FF 0%, #6A00FF 100%);
+  box-shadow: 0 0 16px 4px rgba(161,0,255,0.7);
 }
 
 /* Modal */
@@ -204,14 +206,14 @@ input:focus, select:focus {
 .modal-content {
   width: 1000px;
   max-width: 99%;
-  background: linear-gradient(135deg,#111720 80%, #0a64da 100%);
+  background: linear-gradient(135deg,#1a0033 80%, #6A00FF 100%);
   border-radius: var(--radius);
   padding: 18px 40px;
-  border: 1px solid #29b6f6;
+  border: 1.5px solid rgba(161,0,255,0.18);
   max-height: 80vh;
   overflow-y: auto;
   box-shadow: var(--shadow);
-  color: #e3f2fd;
+  color: #fff;
 }
 
 .modal-content header {
@@ -241,11 +243,11 @@ input:focus, select:focus {
 .daily-table {
   flex: 1;
   min-width: 320px;
-  background: rgba(30, 136, 229, 0.06);
-  border-radius: 8px;
+  background: rgba(106,0,255,0.06);
+  border-radius: 12px;
   padding: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: inset 0 1px 6px rgba(0, 0, 0, 0.15);
+  border: 1.5px solid rgba(161,0,255,0.18);
+  box-shadow: 0 2px 8px rgba(161,0,255,0.08);
 }
 
 .daily-table table {
@@ -256,17 +258,17 @@ input:focus, select:focus {
 .daily-table th, .daily-table td {
   padding: 6px;
   font-size: 13px;
-  border-bottom: 1px dashed rgba(255, 255, 255, 0.06);
+  border-bottom: 1px dashed rgba(161,0,255,0.18);
   text-align: left;
 }
 
 .daily-table input {
   width: 100%;
-  padding: 6px;
-  border-radius: 6px;
-  background: rgba(30, 136, 229, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  color: #e3f2fd;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: #fff;
 }
 
 /* Summary */

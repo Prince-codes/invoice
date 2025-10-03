@@ -39,19 +39,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // populate month/year (same as original)
   const months = [
-    'January','February','March','April','May','June',
-    'July','August','September','October','November','December'
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
   ];
-  months.forEach((m,i) => {
-    const opt = document.createElement('option'); opt.value = i+1; opt.textContent = m;
+  months.forEach((m, i) => {
+    const opt = document.createElement('option'); opt.value = i + 1; opt.textContent = m;
     monthSelect.appendChild(opt);
   });
   const now = new Date();
-  for(let y = now.getFullYear(); y >= now.getFullYear()-5; y--){
+  for (let y = now.getFullYear(); y >= now.getFullYear() - 5; y--) {
     const opt = document.createElement('option'); opt.value = y; opt.textContent = y;
     yearSelect.appendChild(opt);
   }
-  monthSelect.value = now.getMonth()+1;
+  monthSelect.value = now.getMonth() + 1;
   yearSelect.value = now.getFullYear();
 
   // open editor
@@ -68,13 +68,13 @@ document.addEventListener('DOMContentLoaded', () => {
     window.location.href = 'index.html';
   });
 
-  function close(){ modal.classList.remove('show'); tablesContainer.innerHTML = ''; amountWords.value = ''; }
+  function close() { modal.classList.remove('show'); tablesContainer.innerHTML = ''; amountWords.value = ''; }
 
-  function openMonthEditor(){
+  function openMonthEditor() {
     tablesContainer.innerHTML = '';
-    const m = parseInt(monthSelect.value)-1;
+    const m = parseInt(monthSelect.value) - 1;
     const y = parseInt(yearSelect.value);
-    const daysInMonth = new Date(y, m+1, 0).getDate();
+    const daysInMonth = new Date(y, m + 1, 0).getDate();
     // build two tables
     const table1 = buildTable(1, Math.min(15, daysInMonth));
     const table2 = buildTable(16, daysInMonth);
@@ -84,26 +84,29 @@ document.addEventListener('DOMContentLoaded', () => {
     recalcTotals();
   }
 
-  function buildTable(start, end){
+  function buildTable(start, end) {
     const container = document.createElement('div'); container.className = 'daily-table';
     const title = document.createElement('h4'); title.textContent = `${start} - ${end}`; container.appendChild(title);
     const table = document.createElement('table');
     const thead = document.createElement('thead'); thead.innerHTML = '<tr><th>S.no</th><th>Date</th><th>Amount</th></tr>';
     table.appendChild(thead);
     const tbody = document.createElement('tbody');
-    for(let d = start; d <= end; d++){
+    for (let d = start; d <= end; d++) {
       const tr = document.createElement('tr');
       const td1 = document.createElement('td'); td1.textContent = d;
       const td2 = document.createElement('td');
       const y = parseInt(yearSelect.value);
-      const m = parseInt(monthSelect.value)-1;
+      const m = parseInt(monthSelect.value) - 1;
       const dateObj = new Date(y, m, d);
       const dd = String(dateObj.getDate()).padStart(2, '0');
       const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
       const yyyy = dateObj.getFullYear();
       td2.textContent = `${dd}/${mm}/${yyyy}`;
       const td3 = document.createElement('td');
-      const inp = document.createElement('input'); inp.type = 'text'; inp.placeholder = 'amount or -';
+      const inp = document.createElement('input');
+      inp.type = 'number';
+      inp.inputMode = 'decimal';
+      inp.placeholder = 'amount or -';
       inp.dataset.day = d;
       inp.addEventListener('input', recalcTotals);
       td3.appendChild(inp);
@@ -115,8 +118,8 @@ document.addEventListener('DOMContentLoaded', () => {
     return container;
   }
 
-  function recalcTotals(){
-    const inputs = modal.querySelectorAll('input[type="text"]');
+  function recalcTotals() {
+  const inputs = modal.querySelectorAll('input[type="number"]');
     let t1 = 0, t2 = 0;
     inputs.forEach(inp => {
       const val = inp.value.trim();
@@ -135,14 +138,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // numberToWords same simple version
   function numberToWords(num) {
     if (num === 0) return 'Zero';
-    const ones = ['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
-    const tens = ['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
+    const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+    const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
     function convert(n) {
       if (n < 20) return ones[n];
-      if (n < 100) return tens[Math.floor(n/10)] + (n%10 ? ' ' + ones[n%10] : '');
-      if (n < 1000) return ones[Math.floor(n/100)] + ' Hundred' + (n%100 ? ' and ' + convert(n%100) : '');
-      if (n < 100000) return convert(Math.floor(n/1000)) + ' Thousand' + (n%1000 ? ' ' + convert(n%1000) : '');
-      if (n < 10000000) return convert(Math.floor(n/100000)) + ' Lakh' + (n%100000 ? ' ' + convert(n%100000) : '');
+      if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 ? ' ' + ones[n % 10] : '');
+      if (n < 1000) return ones[Math.floor(n / 100)] + ' Hundred' + (n % 100 ? ' and ' + convert(n % 100) : '');
+      if (n < 100000) return convert(Math.floor(n / 1000)) + ' Thousand' + (n % 1000 ? ' ' + convert(n % 1000) : '');
+      if (n < 10000000) return convert(Math.floor(n / 100000)) + ' Lakh' + (n % 100000 ? ' ' + convert(n % 100000) : '');
       return n;
     }
     return convert(num) + ' Only';
@@ -155,17 +158,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const m = parseInt(monthSelect.value); // 1-based month
     const y = parseInt(yearSelect.value);
     const daysInMonth = new Date(y, m, 0).getDate();
-    const monthFirstDay = `${y}-${String(m).padStart(2,'0')}-01`;
-    const monthsArr = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-    const selectedMonthText = `${monthsArr[m-1]} ${y}`;
+    const monthFirstDay = `${y}-${String(m).padStart(2, '0')}-01`;
+    const monthsArr = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const selectedMonthText = `${monthsArr[m - 1]} ${y}`;
 
     // collect daily data
-    const inputs = modal.querySelectorAll('input[type="text"]');
+    const inputs = modal.querySelectorAll('input[type="number"]');
     const dailyRows = [];
     inputs.forEach(inp => {
       const day = Number(inp.dataset.day);
       const raw = inp.value.trim();
-      if (raw === '-' || raw === '') {
+      if (raw === '' || raw === '-') {
         dailyRows.push({ day_num: day, date: formatISODate(y, m - 1, day), amount: null, is_empty: true });
       } else {
         const num = Number(raw);
@@ -193,7 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
       monthYearISO: monthFirstDay,
       monthText: selectedMonthText,
       daily: dailyRows,
-      totals: { t1: Number(t1), t2: Number(t2), grand: Number((t1+t2).toFixed(2)) },
+      totals: { t1: Number(t1), t2: Number(t2), grand: Number((t1 + t2).toFixed(2)) },
       totalWords: amountWords.value || '',
       createdAt: new Date().toISOString(),
       createdBy: sessionStorage.getItem('loggedInUser') || ''
@@ -211,35 +214,35 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ID helpers using localStorage
-  function getNextInvoiceId(){
+  function getNextInvoiceId() {
     let id = Number(localStorage.getItem('nextInvoiceId') || '1');
     localStorage.setItem('nextInvoiceId', String(id + 1));
     return id;
   }
 
-  function saveInvoiceToStorage(inv){
+  function saveInvoiceToStorage(inv) {
     const raw = localStorage.getItem('invoices');
     let arr = [];
-    try { arr = JSON.parse(raw || '[]'); } catch(e) { arr = []; }
+    try { arr = JSON.parse(raw || '[]'); } catch (e) { arr = []; }
     arr.push(inv);
     localStorage.setItem('invoices', JSON.stringify(arr));
   }
 
-  function updateCsvCache(){
+  function updateCsvCache() {
     const invoices = loadInvoicesFromStorage();
     // build CSV header and rows (simple, daily is JSON encoded)
-    const header = ['invoiceId','customerName','monthYearISO','monthText','total','totalWords','createdAt','createdBy','daily_json'];
+    const header = ['invoiceId', 'customerName', 'monthYearISO', 'monthText', 'total', 'totalWords', 'createdAt', 'createdBy', 'daily_json'];
     const rows = invoices.map(inv => {
-      const dailyJson = JSON.stringify(inv.daily).replace(/"/g,'""'); // escape quotes for CSV field
+      const dailyJson = JSON.stringify(inv.daily).replace(/"/g, '""'); // escape quotes for CSV field
       return [
         inv.invoiceId,
-        inv.customerName.replace(/"/g,'""'),
+        inv.customerName.replace(/"/g, '""'),
         inv.monthYearISO,
-        inv.monthText.replace(/"/g,'""'),
+        inv.monthText.replace(/"/g, '""'),
         (inv.totals && inv.totals.grand) ? inv.totals.grand : (inv.total || ''),
-        (inv.totalWords || '').replace(/"/g,'""'),
+        (inv.totalWords || '').replace(/"/g, '""'),
         inv.createdAt || '',
-        (inv.createdBy || '').replace(/"/g,'""'),
+        (inv.createdBy || '').replace(/"/g, '""'),
         `"${dailyJson}"`
       ].join(',');
     });
@@ -247,10 +250,10 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('invoices_csv', csv);
   }
 
-  function loadInvoicesFromStorage(){
+  function loadInvoicesFromStorage() {
     try {
       return JSON.parse(localStorage.getItem('invoices') || '[]');
-    } catch(e) { return []; }
+    } catch (e) { return []; }
   }
 
   // Print builder (reuse original visuals but with client-side data)
@@ -258,7 +261,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const invoice = inv;
     const daily = invoice.daily.map(r => ({ ...r })); // ensure we have day_num,date,amount
     // prepare totals
-    const totals = invoice.totals || { t1:0, t2:0, grand:0 };
+    const totals = invoice.totals || { t1: 0, t2: 0, grand: 0 };
     const html = buildPrintHTML({
       customer: invoice.customerName,
       monthText: invoice.monthText,
@@ -290,7 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function escapeHtml(s) {
       if (!s) return '';
-      return String(s).replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+      return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     }
 
     return `
@@ -300,29 +303,29 @@ document.addEventListener('DOMContentLoaded', () => {
   <meta charset="utf-8">
   <title>Invoice - ${escapeHtml(customer)} - ${escapeHtml(monthText)}</title>
   <style>
-    @page { size: A4; margin: 20mm; }
-    body { font-family: Montserrat, Arial, sans-serif; color:#111; padding:24px; background:#fff; }
-    .invoice-header { display:flex; align-items:center; justify-content:space-between; border-bottom:2px solid #eee; padding-bottom:12px; margin-bottom:18px; }
-    .logo-wrap { width:90px; height:90px; display:flex; align-items:center; justify-content:center; background:linear-gradient(180deg,#FFBF00,#ffd84d); border-radius:16px; box-shadow:0 4px 24px rgba(255,191,0,0.12); }
-    .logo-wrap img { width:70px; height:70px; object-fit:contain; border-radius:12px; }
-    .company-info { margin-left:18px; }
-    .company-info h1 { margin:0; font-size:26px; letter-spacing:1px; }
-    .muted { color:#555; font-size:13px; }
-    .invoice-title { text-align:right; font-weight:700; font-size:20px; letter-spacing:1px; }
-    .invoice-date { text-align:right; color:#888; font-size:14px; }
-    .to-section { margin:18px 0 10px 0; font-weight:600; font-size:15px; }
-    .tables { display:flex; gap:18px; justify-content:space-between; margin-top:12px; }
-    .table { width:48%; background:#fafafa; border-radius:8px; box-shadow:0 2px 8px #eee; }
-    table { width:100%; border-collapse:collapse; }
-    th,td { padding:8px; border:1px solid #ccc; font-size:13px; text-align:left; }
-    th { background:#f5f5f5; font-size:13px; }
-    .right { text-align:right; }
-    .totals { margin-top:18px; font-size:15px; }
-    .totals strong { font-size:16px; color:#222; }
-    .words { margin-top:6px; font-size:13px; color:#444; }
-    .signature-section { margin-top:40px; text-align:right; }
-    .signatory { font-size:15px; font-weight:700; border-top:2px solid #222; display:inline-block; padding-top:8px; margin-top:6px; }
-    .auth-label { font-size:13px; color:#555; margin-bottom:8px; }
+  @page { size: A4; margin: 16mm; }
+  body { font-family: Montserrat, Arial, sans-serif; color:#111; padding:24px 8px; background:#fff; font-size: 15px; }
+  .invoice-header { display:flex; align-items:center; justify-content:space-between; border-bottom:2px solid #eee; padding-bottom:10px; margin-bottom:16px; }
+  .logo-wrap { width:70px; height:70px; display:flex; align-items:center; justify-content:center; background:linear-gradient(180deg,#FFBF00,#ffd84d); border-radius:12px; box-shadow:0 4px 24px rgba(255,191,0,0.12); }
+  .logo-wrap img { width:54px; height:54px; object-fit:contain; border-radius:10px; }
+  .company-info { margin-left:12px; }
+  .company-info h1 { margin:0; font-size:20px; letter-spacing:1px; }
+  .muted { color:#555; font-size:12px; }
+  .invoice-title { text-align:right; font-weight:700; font-size:16px; letter-spacing:1px; }
+  .invoice-date { text-align:right; color:#888; font-size:13px; }
+  .to-section { margin:14px 0 8px 0; font-weight:600; font-size:13px; }
+  .tables { display:flex; gap:12px; justify-content:space-between; margin-top:8px; }
+  .table { width:49%; background:#fafafa; border-radius:8px; box-shadow:0 2px 8px #eee; }
+  table { width:100%; border-collapse:collapse; }
+  th,td { padding:7px; border:1px solid #ccc; font-size:12px; text-align:left; }
+  th { background:#f5f5f5; font-size:12px; }
+  .right { text-align:right; }
+  .totals { margin-top:32px; font-size:13px; }
+  .totals strong { font-size:15px; color:#222; }
+  .words { margin-top:12px; font-size:12px; color:#444; }
+  .signature-section { margin-top:40px; text-align:right; }
+  .signatory { font-size:13px; font-weight:700; border-top:2px solid #222; display:inline-block; padding-top:6px; margin-top:4px; }
+  .auth-label { font-size:11px; color:#555; margin-bottom:6px; }
   </style>
 </head>
 <body>
@@ -395,7 +398,7 @@ document.addEventListener('DOMContentLoaded', () => {
       alert('No previous invoices found. Save some invoices first.');
       return;
     }
-    invoices = invoices.sort((a,b) => Number(a.invoiceId) - Number(b.invoiceId));
+    invoices = invoices.sort((a, b) => Number(a.invoiceId) - Number(b.invoiceId));
     invoices.forEach(inv => {
       const row = document.createElement('tr');
       let monthText = inv.monthText || inv.monthYearISO;
@@ -442,14 +445,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const f = e.target.files[0];
     if (!f) return;
     const reader = new FileReader();
-    reader.onload = function(evt) {
+    reader.onload = function (evt) {
       const text = evt.target.result;
       try {
         const parsed = parseInvoicesCsv(text);
         if (parsed.length === 0) { alert('No invoices found in CSV.'); return; }
         // merge — avoid duplicate invoiceId (if id exists, skip)
         const existing = loadInvoicesFromStorage();
-        const existingIds = new Set(existing.map(i=>i.invoiceId));
+        const existingIds = new Set(existing.map(i => i.invoiceId));
         parsed.forEach(p => {
           if (!existingIds.has(p.invoiceId)) existing.push(p);
         });
@@ -459,7 +462,7 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('nextInvoiceId', String(maxId + 1));
         updateCsvCache();
         alert('Imported invoices. You can now view previous bills.');
-      } catch(err) {
+      } catch (err) {
         console.error(err);
         alert('Failed to parse CSV.');
       }
@@ -476,7 +479,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (lines.length < 2) return [];
     const headerParts = lines[0].split(',');
     const res = [];
-    for (let i=1;i<lines.length;i++){
+    for (let i = 1; i < lines.length; i++) {
       // naive split to get first 8 columns then the final daily_json (which may contain commas/newlines encoded)
       // Since daily_json is quoted, find the first quote after 8 commas
       const line = lines[i];
@@ -485,7 +488,7 @@ document.addEventListener('DOMContentLoaded', () => {
       let cur = '';
       let inQuotes = false;
       for (let ch of line) {
-        if (ch === '"' ) {
+        if (ch === '"') {
           inQuotes = !inQuotes;
           cur += ch;
         } else if (ch === ',' && !inQuotes) {
@@ -500,18 +503,18 @@ document.addEventListener('DOMContentLoaded', () => {
       while (parts.length < 9) parts.push('');
       // map
       const invoiceId = Number(parts[0]) || undefined;
-      const customerName = (parts[1] || '').replace(/""/g,'"').replace(/^"|"$/g,'');
+      const customerName = (parts[1] || '').replace(/""/g, '"').replace(/^"|"$/g, '');
       const monthYearISO = (parts[2] || '');
-      const monthText = (parts[3] || '').replace(/""/g,'"').replace(/^"|"$/g,'');
+      const monthText = (parts[3] || '').replace(/""/g, '"').replace(/^"|"$/g, '');
       const total = parts[4] || '';
-      const totalWords = (parts[5] || '').replace(/""/g,'"').replace(/^"|"$/g,'');
+      const totalWords = (parts[5] || '').replace(/""/g, '"').replace(/^"|"$/g, '');
       const createdAt = parts[6] || '';
-      const createdBy = (parts[7] || '').replace(/""/g,'"').replace(/^"|"$/g,'');
+      const createdBy = (parts[7] || '').replace(/""/g, '"').replace(/^"|"$/g, '');
       let daily_json = parts.slice(8).join(',') || '';
       // strip surrounding quotes from daily_json and unescape double quotes
       daily_json = daily_json.replace(/^"|"$/g, '').replace(/""/g, '"');
       let daily = [];
-      try { daily = JSON.parse(daily_json); } catch(e) { daily = []; }
+      try { daily = JSON.parse(daily_json); } catch (e) { daily = []; }
       const invoice = {
         invoiceId,
         customerName,

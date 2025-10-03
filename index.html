@@ -9,28 +9,32 @@
 </head>
 <body>
     <div class="header-bar">
-  <img src="./logo.png" alt="Logo" class="logo-header">
-        <span class="company-name">SHANKAR SAH</span>
+      <img src="./logo.png" alt="Logo" class="logo-header">
+      <span class="company-name">SHANKAR SAH</span>
     </div>
-    <div class="login-container">
-        <div class="icon-circle"><i class="fa fa-user"></i></div>
-        <h2>Login</h2>
-        <input type="text" id="username" placeholder="Username" />
-        <div class="password-wrapper">
+    <div class="split-layout">
+      <div class="left-panel">
+        <div class="welcome-text">
+          <h1>Welcome Back</h1>
+          <p>We're glad to see you again.<br>Access your invoices and manage your account securely.</p>
+        </div>
+      </div>
+      <div class="right-panel">
+        <div class="login-container glass">
+          <div class="icon-circle"><i class="fa fa-user"></i></div>
+          <h2 class="login-heading">Login</h2>
+          <input type="text" id="username" placeholder="Username" />
+          <div class="password-wrapper">
             <input type="password" id="password" placeholder="Password" />
             <button type="button" id="togglePassword" class="toggle-password"><i class="fa fa-eye"></i></button>
+          </div>
+          <button id="loginBtn" class="neon-btn">Login</button>
+          <p id="errorMsg"></p>
         </div>
-        <button id="loginBtn">Login</button>
-        <p id="errorMsg"></p>
+      </div>
     </div>
 
 <script>
-/*
- Client-side login:
- - Users stored in localStorage key 'users' (array of {username,password})
- - Default user (admin/admin) is created on first load
- - On successful login store session username in sessionStorage 'loggedInUser'
-*/
 
 (function(){
   // ensure default user exists
@@ -39,32 +43,23 @@
     const defaultUsers = [{ username: 'admin', password: '47258369' }];
     localStorage.setItem('users', JSON.stringify(defaultUsers));
   }
-
   const loginBtn = document.getElementById('loginBtn');
   const err = document.getElementById('errorMsg');
-
   loginBtn.addEventListener('click', () => {
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value.trim();
     err.innerText = '';
-
     if (!username || !password) { err.innerText = 'Enter username and password.'; return; }
-
     let users = [];
     try { users = JSON.parse(localStorage.getItem('users') || '[]'); } catch(e) { users = []; }
-
     const found = users.find(u => u.username === username && u.password === password);
     if (found) {
-      // store session
       sessionStorage.setItem('loggedInUser', username);
-      // redirect to main
       window.location.href = 'main.html';
     } else {
       err.innerText = 'Invalid credentials.';
     }
   });
-
-  // Toggle password visibility
   document.getElementById("togglePassword").addEventListener("click", function() {
     const pwd = document.getElementById("password");
     const icon = this.querySelector("i");
@@ -78,12 +73,9 @@
       icon.classList.add("fa-eye");
     }
   });
-
-  // allow Enter key to submit
   document.getElementById('password').addEventListener('keydown', (e) => {
     if (e.key === 'Enter') loginBtn.click();
   });
-
 })();
 </script>
 </body>
