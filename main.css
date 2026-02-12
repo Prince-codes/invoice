@@ -3,6 +3,7 @@
   --primary: #6A00FF;
   --accent: #00E5FF;
   --muted: #BBBBBB;
+  --bg: #0D0D0D;
   --glass: rgba(255,255,255,0.08);
   --blur: 18px;
   --radius: 18px;
@@ -23,7 +24,7 @@ body {
   margin: 0;
   background: radial-gradient(circle at 20% 20%, rgba(106,0,255,0.12) 0%, transparent 50%),
               radial-gradient(circle at 80% 80%, rgba(0,229,255,0.08) 0%, transparent 60%),
-              linear-gradient(180deg, #0D0D0D 0%, #1a0033 100%);
+              linear-gradient(180deg, var(--bg) 0%, #1a0033 100%);
   color: #fff;
 }
 
@@ -36,6 +37,20 @@ body {
   box-shadow: var(--shadow);
   backdrop-filter: blur(var(--blur));
   border: 1.5px solid rgba(161,0,255,0.18);
+  padding: 18px;
+}
+
+/* Top site header (small title above app shell) */
+.site-header {
+  text-align: center;
+  padding: 18px 10px 6px;
+}
+.site-header-inner h1 {
+  margin: 0;
+  font-size: clamp(1.0rem, 1.5vw, 1.6rem);
+  color: #fff;
+  letter-spacing: 0.6px;
+  font-weight: 700;
 }
 
 /* Header */
@@ -60,22 +75,38 @@ body {
 }
 
 .logo-glow {
-  width: 64px;
-  height: 64px;
-  border-radius: 16px;
+  width: 72px;
+  height: 72px;
+  border-radius: 14px; /* rounded square */
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  color: #fff;
-  background: linear-gradient(135deg, var(--primary), var(--accent));
-  box-shadow: 0 0 16px 4px rgba(161,0,255,0.18);
-  font-size: 18px;
+  background: linear-gradient(135deg, rgba(106,0,255,0.95), rgba(0,229,255,0.85));
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35), 0 0 20px rgba(161,0,255,0.12);
+  overflow: hidden;
+  padding: 6px;
+}
+
+.logo-glow .brand-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* subtle border + inner shadow to make the logo feel engraved */
+.logo-glow {
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.logo-glow .brand-logo {
+  box-shadow: inset 0 3px 10px rgba(0,0,0,0.45), inset 0 -2px 6px rgba(255,255,255,0.03);
+  border-radius: 10px;
 }
 
 .brand h1 {
   margin: 0;
-  font-size: 2rem;
+  font-size: clamp(1.2rem, 2.2vw, 1.8rem);
   letter-spacing: 1.2px;
   color: var(--primary);
   font-weight: 800;
@@ -205,7 +236,7 @@ input:focus, select:focus {
 
 .modal-content {
   width: 1000px;
-  max-width: 99%;
+  max-width: 100%;
   background: linear-gradient(135deg,#1a0033 80%, #6A00FF 100%);
   border-radius: var(--radius);
   padding: 18px 40px;
@@ -307,4 +338,36 @@ input:focus, select:focus {
   .actions {
     justify-content: center;
   }
+  .brand {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .brand-right {
+    width: 100%;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+  .logo-glow {
+    width: 56px;
+    height: 56px;
+  }
+  .brand-left > div {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-shell { padding: 12px; }
+  .modal-content { padding: 14px; }
+  .logo-glow { width: 48px; height: 48px; }
+  .brand h1 { font-size: 1.1rem; }
+  .site-header-inner h1 { font-size: 1rem; }
+  .daily-table { min-width: 100%; }
+  #previousBillsTable { width: 100%; }
+  .actions { gap: 8px; flex-direction: column; }
+  .btn { width: 100%; }
 }

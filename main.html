@@ -8,13 +8,11 @@
   <link rel="stylesheet" href="main.css">
 </head>
 <body>
-  <header>
-        <h1>Invoice Generator</h1>
-  </header>
+  <!-- top title removed per request -->
   <main class="app-shell">
     <header class="brand">
       <div class="brand-left">
-      <div class="logo-glow"><img src="./logo.png" alt="logo" style="height:64px;width:64px;object-fit:contain;"></div>
+      <div class="logo-glow"><img src="./logo.png" alt="logo" class="brand-logo"></div>
         <div>
           <h1>SHANKAR SAH</h1>
           <p class="muted">Gamharia market complex - 832108</p>
@@ -22,10 +20,6 @@
       </div>
       <div class="brand-right">
         <div id="userDisplay" class="muted"></div>
-        <!-- Google Drive integration buttons and CSV import/export -->
-        <button id="connectDriveBtn" class="btn" title="Connect Google Drive">Connect Drive</button>
-        <button id="saveDriveBtn" class="btn" title="Save invoices to Google Drive">Save to Drive</button>
-        <button id="loadDriveBtn" class="btn" title="Load invoices from Google Drive">Load from Drive</button>
         <!-- Small utility buttons for CSV import/export (kept unobtrusive) -->
         <input type="file" id="importCsv" accept=".csv" style="display:none" />
         <button id="exportCsvBtn" class="btn" title="Export all invoices as CSV">Export CSV</button>
