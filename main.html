@@ -22,6 +22,10 @@
       </div>
       <div class="brand-right">
         <div id="userDisplay" class="muted"></div>
+        <!-- Google Drive integration buttons and CSV import/export -->
+        <button id="connectDriveBtn" class="btn" title="Connect Google Drive">Connect Drive</button>
+        <button id="saveDriveBtn" class="btn" title="Save invoices to Google Drive">Save to Drive</button>
+        <button id="loadDriveBtn" class="btn" title="Load invoices from Google Drive">Load from Drive</button>
         <!-- Small utility buttons for CSV import/export (kept unobtrusive) -->
         <input type="file" id="importCsv" accept=".csv" style="display:none" />
         <button id="exportCsvBtn" class="btn" title="Export all invoices as CSV">Export CSV</button>
@@ -83,6 +87,8 @@
 
         <footer class="modal-footer">
           <button id="saveBtn" class="btn primary">Save & Print</button>
+          <button id="saveDraftBtn" class="btn">Save Draft</button>
+          <button id="updateBtn" class="btn" style="display:none">Save Changes</button>
           <button id="cancelBtn" class="btn">Cancel</button>
         </footer>
       </div>

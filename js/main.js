@@ -32,6 +32,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const closePreviousModal = document.getElementById('closePreviousModal');
   const previousBillsTableBody = document.querySelector("#previousBillsTable tbody");
 
+  // Drive / editor controls
+  const connectDriveBtn = document.getElementById('connectDriveBtn');
+  const saveDriveBtn = document.getElementById('saveDriveBtn');
+  const loadDriveBtn = document.getElementById('loadDriveBtn');
+  const saveDraftBtn = document.getElementById('saveDraftBtn');
+  const updateBtn = document.getElementById('updateBtn');
+
+  // editing state
+  let editingInvoiceId = null;
+
   // CSV import/export buttons
   const exportCsvBtn = document.getElementById('exportCsvBtn');
   const importCsvBtn = document.getElementById('importCsvBtn');
@@ -68,7 +78,15 @@ document.addEventListener('DOMContentLoaded', () => {
     window.location.href = 'index.html';
   });
 
-  function close() { modal.classList.remove('show'); tablesContainer.innerHTML = ''; amountWords.value = ''; }
+  function close() { modal.classList.remove('show'); tablesContainer.innerHTML = ''; amountWords.value = ''; resetEditorState(); }
+  
+  // ensure modal closed resets editing state/buttons
+  function resetEditorState() {
+    editingInvoiceId = null;
+    saveBtn.style.display = '';
+    saveDraftBtn.style.display = '';
+    updateBtn.style.display = 'none';
+  }
 
   function openMonthEditor() {
     tablesContainer.innerHTML = '';
@@ -80,6 +98,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const table2 = buildTable(16, daysInMonth);
     tablesContainer.appendChild(table1);
     tablesContainer.appendChild(table2);
+    // new invoice — clear editing state and show create buttons
+    editingInvoiceId = null;
+    saveBtn.style.display = '';
+    saveDraftBtn.style.display = '';
+    updateBtn.style.display = 'none';
     modal.classList.add('show');
     recalcTotals();
   }
@@ -151,66 +174,9 @@ document.addEventListener('DOMContentLoaded', () => {
     return convert(num) + ' Only';
   }
 
-  // Save + Print flow (client-side)
-  saveBtn.addEventListener('click', async () => {
-    const cust = customerInput.value.trim();
-    if (!cust) return alert('Enter customer name first.');
-    const m = parseInt(monthSelect.value); // 1-based month
-    const y = parseInt(yearSelect.value);
-    const daysInMonth = new Date(y, m, 0).getDate();
-    const monthFirstDay = `${y}-${String(m).padStart(2, '0')}-01`;
-    const monthsArr = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    const selectedMonthText = `${monthsArr[m - 1]} ${y}`;
-
-    // collect daily data
-    const inputs = modal.querySelectorAll('input[type="number"]');
-    const dailyRows = [];
-    inputs.forEach(inp => {
-      const day = Number(inp.dataset.day);
-      const raw = inp.value.trim();
-      if (raw === '' || raw === '-') {
-        dailyRows.push({ day_num: day, date: formatISODate(y, m - 1, day), amount: null, is_empty: true });
-      } else {
-        const num = Number(raw);
-        if (isNaN(num)) {
-          dailyRows.push({ day_num: day, date: formatISODate(y, m - 1, day), amount: null, is_empty: true });
-        } else {
-          dailyRows.push({ day_num: day, date: formatISODate(y, m - 1, day), amount: num, is_empty: false });
-        }
-      }
-    });
-
-    // totals
-    let t1 = 0, t2 = 0;
-    dailyRows.forEach(r => {
-      if (!r.is_empty && r.amount !== null) {
-        if (r.day_num <= 15) t1 += Number(r.amount); else t2 += Number(r.amount);
-      }
-    });
-    const totalAmount = (t1 + t2).toFixed(2);
-
-    // prepare invoice object
-    const invoice = {
-      invoiceId: getNextInvoiceId(),
-      customerName: cust,
-      monthYearISO: monthFirstDay,
-      monthText: selectedMonthText,
-      daily: dailyRows,
-      totals: { t1: Number(t1), t2: Number(t2), grand: Number((t1 + t2).toFixed(2)) },
-      totalWords: amountWords.value || '',
-      createdAt: new Date().toISOString(),
-      createdBy: sessionStorage.getItem('loggedInUser') || ''
-    };
-
-    // persist to localStorage
-    saveInvoiceToStorage(invoice);
-
-    // update CSV cache (we maintain a CSV representation accessible via export)
-    updateCsvCache();
-
-    // close modal and print
-    modal.classList.remove('show');
-    openPrintWindow(invoice);
+  // Save + Print flow (client-side) — route through central handler
+  saveBtn.addEventListener('click', () => {
+    handleSave({ asDraft: false });
   });
 
   // ID helpers using localStorage
@@ -410,9 +376,9 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
       row.style.cursor = 'pointer';
       row.addEventListener('click', () => {
-        // open and print this invoice
+        // open this invoice in editor for viewing/editing
         previousBillsModal.style.display = 'none';
-        openPrintWindow(inv);
+        openInvoiceInEditor(inv);
       });
       previousBillsTableBody.appendChild(row);
     });
@@ -533,5 +499,258 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // initially ensure CSV cache exists
   if (!localStorage.getItem('invoices_csv')) updateCsvCache();
+
+  // --- Google Drive integration (uses gapi) ---
+  // NOTE: You must create an OAuth 2.0 Client ID in Google Cloud Console and replace CLIENT_ID below.
+  const GOOGLE_CLIENT_ID = '201094454025-oo9v2c3ob2nib6334db10ikdqkk1sds0.apps.googleusercontent.com';
+  const GOOGLE_API_KEY = 'AIzaSyDISWD4AlFSxUKqQW-J5IQkAkz7FKCw5Uo'; // optional if you use discovery docs requiring API key
+  const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
+  let gapiInited = false;
+
+  // load gapi script dynamically
+  (function loadGapi(){
+    const s = document.createElement('script');
+    s.src = 'https://apis.google.com/js/api.js';
+    s.onload = () => {
+      gapi.load('client:auth2', async () => {
+        try {
+          await gapi.client.init({
+            apiKey: GOOGLE_API_KEY,
+            clientId: GOOGLE_CLIENT_ID,
+            discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
+            scope: DRIVE_SCOPE
+          });
+          gapiInited = true;
+          updateDriveUi();
+        } catch (err) {
+          console.warn('gapi init failed', err);
+        }
+      });
+    };
+    document.head.appendChild(s);
+  })();
+
+  function updateDriveUi(){
+    try {
+      const signedIn = gapi && gapi.auth2 && gapi.auth2.getAuthInstance().isSignedIn.get();
+      connectDriveBtn.textContent = signedIn ? 'Disconnect Drive' : 'Connect Drive';
+    } catch (e) { connectDriveBtn.textContent = 'Connect Drive'; }
+  }
+
+  connectDriveBtn.addEventListener('click', async () => {
+    if (!gapiInited) return alert('Google API not ready.');
+    const auth = gapi.auth2.getAuthInstance();
+    if (!auth) return alert('Google Auth not available.');
+    if (auth.isSignedIn.get()) {
+      auth.signOut();
+      updateDriveUi();
+      alert('Signed out from Google Drive.');
+    } else {
+      try {
+        await auth.signIn();
+        updateDriveUi();
+        alert('Connected to Google Drive.');
+      } catch (err) { console.error(err); alert('Drive sign-in failed.'); }
+    }
+  });
+
+  saveDriveBtn.addEventListener('click', async () => {
+    if (!gapiInited) return alert('Google API not ready.');
+    const auth = gapi.auth2.getAuthInstance();
+    if (!auth || !auth.isSignedIn.get()) return alert('Please connect Google Drive first.');
+    try {
+      await saveCsvToDrive();
+      alert('Saved invoices CSV to Google Drive.');
+    } catch (err) { console.error(err); alert('Failed to save to Drive.'); }
+  });
+
+  loadDriveBtn.addEventListener('click', async () => {
+    if (!gapiInited) return alert('Google API not ready.');
+    const auth = gapi.auth2.getAuthInstance();
+    if (!auth || !auth.isSignedIn.get()) return alert('Please connect Google Drive first.');
+    try {
+      await loadCsvFromDrive();
+    } catch (err) { console.error(err); alert('Failed to load from Drive.'); }
+  });
+
+  async function saveCsvToDrive() {
+    // find existing file for this user or create a new one
+    const username = sessionStorage.getItem('loggedInUser') || 'default';
+    const filename = `invoices_${username}.csv`;
+    const csv = localStorage.getItem('invoices_csv') || '';
+    // find file
+    const file = await findDriveFileByName(filename);
+    const accessToken = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token;
+    if (!file) {
+      // create
+      await uploadOrUpdateFile({ name: filename, content: csv, accessToken, method: 'POST' });
+    } else {
+      // update
+      await uploadOrUpdateFile({ fileId: file.id, name: filename, content: csv, accessToken, method: 'PATCH' });
+    }
+  }
+
+  async function loadCsvFromDrive() {
+    const username = sessionStorage.getItem('loggedInUser') || 'default';
+    const filename = `invoices_${username}.csv`;
+    const file = await findDriveFileByName(filename);
+    if (!file) return alert('No invoices file found in your Drive. Use Save to Drive first.');
+    const accessToken = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token;
+    const res = await fetch(`https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`, {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    });
+    if (!res.ok) throw new Error('Download failed');
+    const text = await res.text();
+    // parse and merge into storage (reuse parseInvoicesCsv)
+    const parsed = parseInvoicesCsv(text);
+    if (parsed.length === 0) return alert('No invoices found in Drive CSV.');
+    const existing = loadInvoicesFromStorage();
+    const existingIds = new Set(existing.map(i => i.invoiceId));
+    parsed.forEach(p => { if (!existingIds.has(p.invoiceId)) existing.push(p); });
+    localStorage.setItem('invoices', JSON.stringify(existing));
+    const maxId = existing.reduce((mx, it) => Math.max(mx, Number(it.invoiceId || 0)), 0);
+    localStorage.setItem('nextInvoiceId', String(maxId + 1));
+    updateCsvCache();
+    alert('Loaded invoices from Drive.');
+  }
+
+  async function findDriveFileByName(name) {
+    const q = `name = '${name.replace(/'/g, "\\'")}' and trashed = false`;
+    const resp = await gapi.client.drive.files.list({ q, fields: 'files(id,name,modifiedTime)', pageSize: 10 });
+    const files = resp.result.files || [];
+    return files.length ? files[0] : null;
+  }
+
+  async function uploadOrUpdateFile({ fileId, name, content, accessToken, method = 'POST' }) {
+    // multipart upload using fetch (multipart/related)
+    const boundary = '-------invoiceBoundary' + Date.now();
+    const metadata = { name, mimeType: 'text/csv' };
+    const multipartRequestBody =
+      `--${boundary}\r\n` +
+      'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
+      JSON.stringify(metadata) + '\r\n' +
+      `--${boundary}\r\n` +
+      'Content-Type: text/csv\r\n\r\n' +
+      content + '\r\n' +
+      `--${boundary}--`;
+
+    const url = fileId
+      ? `https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=multipart`
+      : `https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart`;
+
+    const resp = await fetch(url, {
+      method: fileId ? 'PATCH' : 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': `multipart/related; boundary=${boundary}`
+      },
+      body: multipartRequestBody
+    });
+    if (!resp.ok) throw new Error('Drive upload failed');
+    return resp.json();
+  }
+
+  // --- Draft/edit UI wiring ---
+  function openInvoiceInEditor(inv) {
+    // populate fields
+    editingInvoiceId = inv.invoiceId;
+    customerInput.value = inv.customerName || '';
+    // set month/year selects from monthYearISO if available
+    try {
+      const iso = inv.monthYearISO; // e.g., 2025-02-01
+      if (iso) {
+        const parts = iso.split('-');
+        yearSelect.value = parts[0];
+        monthSelect.value = Number(parts[1]);
+      }
+    } catch (e) {}
+    // build editor tables
+    tablesContainer.innerHTML = '';
+    const daysInMonth = new Date(Number(yearSelect.value), Number(monthSelect.value), 0).getDate();
+    const table1 = buildTable(1, Math.min(15, daysInMonth));
+    const table2 = buildTable(16, daysInMonth);
+    tablesContainer.appendChild(table1);
+    tablesContainer.appendChild(table2);
+    // fill values
+    const inputs = modal.querySelectorAll('input[type="number"]');
+    inv.daily.forEach(d => {
+      const matching = Array.from(inputs).find(i => Number(i.dataset.day) === Number(d.day_num));
+      if (matching) matching.value = (d.is_empty || d.amount === null) ? '' : d.amount;
+    });
+    amountWords.value = inv.totalWords || '';
+    // show modal and adjust buttons
+    modal.classList.add('show');
+    saveBtn.style.display = 'none';
+    saveDraftBtn.style.display = 'none';
+    updateBtn.style.display = 'inline-block';
+    recalcTotals();
+  }
+
+  // Save draft handler
+  saveDraftBtn.addEventListener('click', () => {
+    handleSave({ asDraft: true });
+  });
+
+  // Update existing invoice
+  updateBtn.addEventListener('click', () => {
+    if (!editingInvoiceId) return alert('No invoice selected to update.');
+    handleSave({ updateExisting: true });
+  });
+
+  // central save routine for create/update/draft
+  function handleSave({ asDraft = false, updateExisting = false } = {}) {
+    const cust = customerInput.value.trim();
+    if (!cust) return alert('Enter customer name first.');
+    const m = parseInt(monthSelect.value); // 1-based
+    const y = parseInt(yearSelect.value);
+    const inputs = modal.querySelectorAll('input[type="number"]');
+    const dailyRows = [];
+    inputs.forEach(inp => {
+      const day = Number(inp.dataset.day);
+      const raw = inp.value.trim();
+      if (raw === '' || raw === '-') {
+        dailyRows.push({ day_num: day, date: formatISODate(y, m - 1, day), amount: null, is_empty: true });
+      } else {
+        const num = Number(raw);
+        if (isNaN(num)) dailyRows.push({ day_num: day, date: formatISODate(y, m - 1, day), amount: null, is_empty: true });
+        else dailyRows.push({ day_num: day, date: formatISODate(y, m - 1, day), amount: num, is_empty: false });
+      }
+    });
+    let t1 = 0, t2 = 0;
+    dailyRows.forEach(r => { if (!r.is_empty && r.amount !== null) { if (r.day_num <= 15) t1 += Number(r.amount); else t2 += Number(r.amount); } });
+    const invoiceObj = {
+      invoiceId: updateExisting ? editingInvoiceId : getNextInvoiceId(),
+      customerName: cust,
+      monthYearISO: `${y}-${String(m).padStart(2,'0')}-01`,
+      monthText: `${['January','February','March','April','May','June','July','August','September','October','November','December'][m-1]} ${y}`,
+      daily: dailyRows,
+      totals: { t1: Number(t1), t2: Number(t2), grand: Number((t1 + t2).toFixed(2)) },
+      totalWords: amountWords.value || '',
+      createdAt: new Date().toISOString(),
+      createdBy: sessionStorage.getItem('loggedInUser') || ''
+    };
+
+    if (updateExisting) {
+      // replace existing
+      const arr = loadInvoicesFromStorage();
+      const idx = arr.findIndex(i => Number(i.invoiceId) === Number(editingInvoiceId));
+      if (idx >= 0) arr[idx] = invoiceObj;
+      localStorage.setItem('invoices', JSON.stringify(arr));
+      updateCsvCache();
+      editingInvoiceId = null;
+      modal.classList.remove('show');
+      saveBtn.style.display = '';
+      saveDraftBtn.style.display = '';
+      updateBtn.style.display = 'none';
+      alert('Invoice updated.');
+      return;
+    }
+
+    // normal create (draft or print)
+    saveInvoiceToStorage(invoiceObj);
+    updateCsvCache();
+    modal.classList.remove('show');
+    if (!asDraft) openPrintWindow(invoiceObj);
+  }
 
 });
