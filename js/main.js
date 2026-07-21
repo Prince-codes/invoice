@@ -323,12 +323,15 @@ document.addEventListener('DOMContentLoaded', () => {
     font-size: 13px;
   }
   .invoice-shell {
-    max-width: 210mm;
+    width: calc(100% - 9mm);
+    max-width: 201mm;
     margin: 0 auto;
     background: #fff;
     box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
     padding: 18px 22px 24px;
     border-radius: 14px;
+    box-sizing: border-box;
+    page-break-after: always;
   }
   .invoice-header {
     display: flex;
@@ -337,6 +340,7 @@ document.addEventListener('DOMContentLoaded', () => {
     gap: 16px;
     padding-bottom: 12px;
     border-bottom: 2px solid #cbd5e1;
+    flex-wrap: wrap;
   }
   .brand-block {
     display: flex;
@@ -387,13 +391,15 @@ document.addEventListener('DOMContentLoaded', () => {
     font-size: 11px;
     font-weight: 700;
   }
-  .table-grid { display: flex; gap: 12px; margin-top: 8px; }
+  .table-grid { display: flex; gap: 12px; margin-top: 8px; flex-wrap: wrap; }
   .table-card {
-    flex: 1;
+    flex: 1 1 48%;
+    min-width: 260px;
     background: #fff;
     border: 1px solid #cbd5e1;
     border-radius: 10px;
     overflow: hidden;
+    page-break-inside: avoid;
   }
   .table-card h3 {
     margin: 0;
@@ -418,6 +424,7 @@ document.addEventListener('DOMContentLoaded', () => {
     background: linear-gradient(135deg, #f8fafc, #f3f4f6);
     border: 1px solid #cbd5e1;
     border-radius: 12px;
+    page-break-inside: avoid;
   }
   .summary-list { flex: 1; }
   .summary-row {
@@ -447,8 +454,13 @@ document.addEventListener('DOMContentLoaded', () => {
   .auth-label { margin-top: 4px; color: #6b7280; font-size: 11px; }
   .footer-note { margin-top: 18px; text-align: center; color: #6b7280; font-size: 11px; }
   @media print {
-    body { background: #fff; }
-    .invoice-shell { box-shadow: none; border-radius: 0; padding: 0; }
+    body { background: #fff; margin: 0; padding: 0; }
+    .invoice-shell { box-shadow: none; border-radius: 0; padding: 0; width: 100%; max-width: none; }
+    .invoice-header, .table-grid, .summary-card, .bill-to {
+      page-break-inside: avoid;
+    }
+    .table-card { break-inside: avoid; }
+    .invoice-shell * { box-sizing: border-box; }
   }
   </style>
 </head>
@@ -523,12 +535,12 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
   }
 
-  function formatISODate(year, monthZeroBased, day) {
+  function formatInvoiceDate(year, monthZeroBased, day) {
     const d = new Date(year, monthZeroBased, day);
     const y = d.getFullYear();
     const m = String(d.getMonth() + 1).padStart(2, '0');
     const dd = String(d.getDate()).padStart(2, '0');
-    return `${y}-${m}-${dd}`;
+    return `${dd}/${m}/${y}`;
   }
 
   // Previous bills modal logic (client-side)
