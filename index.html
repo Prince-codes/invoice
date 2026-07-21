@@ -34,50 +34,7 @@
       </div>
     </div>
 
-<script>
-
-(function(){
-  // ensure default user exists
-  const raw = localStorage.getItem('users');
-  if (!raw) {
-    const defaultUsers = [{ username: 'admin', password: '47258369' }];
-    localStorage.setItem('users', JSON.stringify(defaultUsers));
-  }
-  const loginBtn = document.getElementById('loginBtn');
-  const err = document.getElementById('errorMsg');
-  loginBtn.addEventListener('click', () => {
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value.trim();
-    err.innerText = '';
-    if (!username || !password) { err.innerText = 'Enter username and password.'; return; }
-    let users = [];
-    try { users = JSON.parse(localStorage.getItem('users') || '[]'); } catch(e) { users = []; }
-    const found = users.find(u => u.username === username && u.password === password);
-    if (found) {
-      sessionStorage.setItem('loggedInUser', username);
-      window.location.href = 'main.html';
-    } else {
-      err.innerText = 'Invalid credentials.';
-    }
-  });
-  document.getElementById("togglePassword").addEventListener("click", function() {
-    const pwd = document.getElementById("password");
-    const icon = this.querySelector("i");
-    if (pwd.type === "password") {
-      pwd.type = "text";
-      icon.classList.remove("fa-eye");
-      icon.classList.add("fa-eye-slash");
-    } else {
-      pwd.type = "password";
-      icon.classList.remove("fa-eye-slash");
-      icon.classList.add("fa-eye");
-    }
-  });
-  document.getElementById('password').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') loginBtn.click();
-  });
-})();
-</script>
+<script src="js/login.js"></script>
 </body>
 </html>
 

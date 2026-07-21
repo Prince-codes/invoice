@@ -40,19 +40,6 @@ body {
   padding: 18px;
 }
 
-/* Top site header (small title above app shell) */
-.site-header {
-  text-align: center;
-  padding: 18px 10px 6px;
-}
-.site-header-inner h1 {
-  margin: 0;
-  font-size: clamp(1.0rem, 1.5vw, 1.6rem);
-  color: #fff;
-  letter-spacing: 0.6px;
-  font-weight: 700;
-}
-
 /* Header */
 .brand {
   display: flex;
@@ -77,7 +64,7 @@ body {
 .logo-glow {
   width: 72px;
   height: 72px;
-  border-radius: 14px; /* rounded square */
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -85,6 +72,7 @@ body {
   box-shadow: 0 6px 18px rgba(0,0,0,0.35), 0 0 20px rgba(161,0,255,0.12);
   overflow: hidden;
   padding: 6px;
+  border: 1px solid rgba(255,255,255,0.06);
 }
 
 .logo-glow .brand-logo {
@@ -92,14 +80,6 @@ body {
   height: 100%;
   object-fit: cover;
   display: block;
-}
-
-/* subtle border + inner shadow to make the logo feel engraved */
-.logo-glow {
-  border: 1px solid rgba(255,255,255,0.06);
-}
-
-.logo-glow .brand-logo {
   box-shadow: inset 0 3px 10px rgba(0,0,0,0.45), inset 0 -2px 6px rgba(255,255,255,0.03);
   border-radius: 10px;
 }
@@ -179,6 +159,10 @@ input:focus, select:focus {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+}
+
+.is-hidden {
+  display: none !important;
 }
 
 .btn {
@@ -263,6 +247,55 @@ input:focus, select:focus {
 
 .modal-body {
   margin-top: 12px;
+}
+
+.previous-bills-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.previous-bills-title {
+  margin: 0;
+  color: var(--accent);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.previous-bills-body {
+  margin-top: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.previous-bills-table {
+  width: 600px;
+  max-width: 100%;
+  margin: 0 auto;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px #eee;
+  background: rgba(30, 136, 229, 0.06);
+}
+
+.previous-bills-table thead {
+  background: var(--glass);
+  color: var(--accent);
+}
+
+.previous-bills-table th,
+.previous-bills-table td {
+  text-align: center;
+}
+
+.previous-bills-note {
+  margin-top: 12px;
+}
+
+.previous-bills-note small {
+  color: var(--muted);
 }
 
 #tablesContainer {

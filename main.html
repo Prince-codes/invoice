@@ -8,7 +8,6 @@
   <link rel="stylesheet" href="main.css">
 </head>
 <body>
-  <!-- top title removed per request -->
   <main class="app-shell">
     <header class="brand">
       <div class="brand-left">
@@ -82,35 +81,37 @@
         <footer class="modal-footer">
           <button id="saveBtn" class="btn primary">Save & Print</button>
           <button id="saveDraftBtn" class="btn">Save Draft</button>
-          <button id="updateBtn" class="btn" style="display:none">Save Changes</button>
+          <button id="updateBtn" class="btn is-hidden">Save Changes</button>
+          <button id="printEditedBtn" class="btn is-hidden">Print</button>
           <button id="cancelBtn" class="btn">Cancel</button>
         </footer>
       </div>
     </div>
 
     <!-- Modal for previous bills -->
-    <div id="previousBillsModal" class="modal">
+    <div id="previousBillsModal" class="modal previous-bills-modal">
     <div class="modal-content">
-      <header style="display:flex;justify-content:space-between;align-items:center;">
-        <h3 style="margin:0;color:var(--accent);font-size:20px;font-weight:700;">Previous Bills</h3>
+      <header class="previous-bills-header">
+        <h3 class="previous-bills-title">Previous Bills</h3>
         <button class="close" id="closePreviousModal" title="Close">&times;</button>
       </header>
-      <div class="modal-body" style="margin-top:18px;display:flex;justify-content:center;align-items:center;flex-direction:column;">
-        <table id="previousBillsTable" style="width:600px;max-width:100%;margin:0 auto;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px #eee;background:rgba(30,136,229,0.06);">
+      <div class="modal-body previous-bills-body">
+        <table id="previousBillsTable" class="previous-bills-table">
           <thead>
-            <tr style="background:var(--glass);color:var(--accent);">
-              <th style="text-align:center;">ID</th>
-              <th style="text-align:center;">Customer</th>
-              <th style="text-align:center;">Month-Year</th>
-              <th style="text-align:center;">Total</th>
+            <tr>
+              <th>ID</th>
+              <th>Customer</th>
+              <th>Month-Year</th>
+              <th>Total</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
             <!-- Filled dynamically -->
           </tbody>
         </table>
-        <div style="margin-top:12px;">
-          <small style="color:var(--muted)">Click any row to open & print that invoice.</small>
+        <div class="previous-bills-note">
+          <small>Click any row to open & print that invoice.</small>
         </div>
       </div>
     </div>
