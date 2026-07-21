@@ -535,12 +535,12 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
   }
 
-  function formatInvoiceDate(year, monthZeroBased, day) {
+  function formatISODate(year, monthZeroBased, day) {
     const d = new Date(year, monthZeroBased, day);
     const y = d.getFullYear();
     const m = String(d.getMonth() + 1).padStart(2, '0');
     const dd = String(d.getDate()).padStart(2, '0');
-    return `${dd}/${m}/${y}`;
+    return `${y}-${m}-${dd}`;
   }
 
   // Previous bills modal logic (client-side)
