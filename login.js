@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const found = users.find(u => u.username === username && u.password === password);
     if (found) {
       sessionStorage.setItem('loggedInUser', username);
-      window.location.href = 'main.html';
+      window.location.href = 'Selection/selection.html';
     } else {
       err.innerText = 'Invalid credentials.';
     }
