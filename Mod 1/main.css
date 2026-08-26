@@ -549,6 +549,10 @@ input:focus, select:focus {
     margin: 12px auto;
   }
 
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
   .brand-right {
     justify-content: flex-start;
   }

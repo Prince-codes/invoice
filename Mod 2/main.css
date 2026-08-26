@@ -613,6 +613,10 @@ input:focus, select:focus {
     margin: 12px auto;
   }
 
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
   .brand-right {
     justify-content: flex-start;
   }
@@ -704,5 +708,10 @@ input:focus, select:focus {
   .modal-summary {
     display: grid;
     grid-template-columns: 1fr;
+  }
+
+  .item-row input {
+    padding: 9px 10px;
+    font-size: .95rem;
   }
 }
