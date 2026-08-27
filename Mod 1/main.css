@@ -411,7 +411,6 @@ input:focus, select:focus {
   .modal-content { padding: 14px; }
   .logo-glow { width: 48px; height: 48px; }
   .brand h1 { font-size: 1.1rem; }
-  .site-header-inner h1 { font-size: 1rem; }
   .daily-table { min-width: 100%; }
   #previousBillsTable { width: 100%; }
   .actions { gap: 8px; flex-direction: column; }

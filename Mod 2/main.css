@@ -319,7 +319,7 @@ input:focus, select:focus {
 
 .item-row {
   display: grid;
-  grid-template-columns: 42px minmax(160px, 1.8fr) minmax(100px, .8fr) minmax(120px, 1fr) minmax(120px, 1fr) 34px;
+  grid-template-columns: 42px minmax(160px, 1.8fr) minmax(100px, .8fr) minmax(120px, 1fr) minmax(120px, 1fr) 72px;
   gap: 8px;
   align-items: center;
   padding: 8px;
@@ -330,18 +330,13 @@ input:focus, select:focus {
 
 .item-header {
   display: grid;
-  grid-template-columns: 42px minmax(160px, 1.8fr) minmax(100px, .8fr) minmax(120px, 1fr) minmax(120px, 1fr) 34px;
+  grid-template-columns: 42px minmax(160px, 1.8fr) minmax(100px, .8fr) minmax(120px, 1fr) minmax(120px, 1fr) 72px;
   gap: 8px;
   padding: 0 8px 5px;
   color: var(--muted);
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: .04em;
-}
-
-.item-row::before {
-  content: 'S.no.  Item name  Quantity  Quote price  Price';
-  display: none;
 }
 
 .item-number {
@@ -359,46 +354,25 @@ input:focus, select:focus {
   opacity: .8;
 }
 
+.item-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.add-item-row,
 .remove-item {
+  flex: 0 0 32px;
   width: 32px;
   height: 32px;
+  padding: 0;
+  line-height: 1;
   border: 1px solid rgba(255,255,255,.2);
   border-radius: 8px;
   background: rgba(255,255,255,.08);
   color: #fff;
   cursor: pointer;
   font-size: 20px;
-}
-
-.daily-table {
-  flex: 1;
-  min-width: 320px;
-  background: rgba(106,0,255,0.06);
-  border-radius: 12px;
-  padding: 8px;
-  border: 1.5px solid rgba(161,0,255,0.18);
-  box-shadow: 0 2px 8px rgba(161,0,255,0.08);
-}
-
-.daily-table table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.daily-table th, .daily-table td {
-  padding: 6px;
-  font-size: 13px;
-  border-bottom: 1px dashed rgba(161,0,255,0.18);
-  text-align: left;
-}
-
-.daily-table input {
-  width: 100%;
-  padding: 10px 12px;
-  border-radius: 10px;
-  background: rgba(255,255,255,0.1);
-  border: none;
-  color: #fff;
 }
 
 /* Summary */
@@ -411,8 +385,14 @@ input:focus, select:focus {
   color: var(--muted);
 }
 
+.dues-field {
+  min-width: 180px;
+}
+
 .total-all {
-  font-weight: 700;
+  font-weight: 600;
+  font-size: 1.10rem;
+  line-height: 1.1;
   color: var(--accent);
 }
 
@@ -430,9 +410,6 @@ input:focus, select:focus {
   .form-grid {
     grid-template-columns: 1fr;
     gap: 12px;
-  }
-  #tablesContainer {
-    flex-direction: column;
   }
   .item-row {
     grid-template-columns: 34px 1fr 1fr;
@@ -486,8 +463,6 @@ input:focus, select:focus {
   .modal-content { padding: 14px; }
   .logo-glow { width: 48px; height: 48px; }
   .brand h1 { font-size: 1.1rem; }
-  .site-header-inner h1 { font-size: 1rem; }
-  .daily-table { min-width: 100%; }
   #previousBillsTable { width: 100%; }
   .actions { gap: 8px; flex-direction: column; }
   .btn { width: 100%; }
@@ -587,7 +562,7 @@ input:focus, select:focus {
 
 .item-header,
 .item-row {
-  grid-template-columns: 48px minmax(180px, 1.8fr) minmax(110px, .8fr) minmax(130px, 1fr) minmax(130px, 1fr) 36px;
+  grid-template-columns: 48px minmax(180px, 1.8fr) minmax(110px, .8fr) minmax(130px, 1fr) minmax(130px, 1fr) 72px;
   gap: 10px;
 }
 
@@ -648,6 +623,11 @@ input:focus, select:focus {
   .item-row .remove-item {
     grid-column: 3;
     justify-self: end;
+  }
+
+  .item-row .item-actions {
+    grid-column: 3;
+    justify-content: flex-end;
   }
 }
 
@@ -713,5 +693,9 @@ input:focus, select:focus {
   .item-row input {
     padding: 9px 10px;
     font-size: .95rem;
+  }
+
+  .dues-field {
+    width: 100%;
   }
 }

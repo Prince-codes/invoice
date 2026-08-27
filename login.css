@@ -1,11 +1,4 @@
 
-#previousBillsTable {
-    display: block;
-    max-height: 400px;
-    overflow-y: auto;
-    width: 100%;
-}
-
 body {
   font-family: 'Montserrat', sans-serif;
   margin: 0;
@@ -292,10 +285,6 @@ body {
 }
 }
 
-
-.logo {
-    display: none;
-}
 
 /* Password input and toggle styles */
 .password-wrapper {

@@ -58,14 +58,17 @@
         <div class="modal-body">
           <div class="items-toolbar">
             <span>Bill Items</span>
-            <button id="addItemBtn" type="button" class="btn">+ Add Item</button>
           </div>
           <div class="item-header" aria-hidden="true">
-            <span>Sr. No.</span><span>Item Name</span><span>Quantity</span><span>Quote Price</span><span>Price</span><span></span>
+            <span>Sr. No.</span><span>Item Name</span><span>Quantity<br>(Pkgs. / Kgs)</span><span>Quote Price</span><span>Price</span><span></span>
           </div>
           <div id="tablesContainer"></div>
 
           <div class="modal-summary">
+            <label class="dues-field">
+              Previous Dues
+              <input id="previousDues" type="number" min="0" step="0.01" placeholder="0.00" />
+            </label>
             <div class="total-all">Total Amount: <span id="totalAll">0.00</span></div>
           </div>
 
@@ -77,6 +80,7 @@
 
         <footer class="modal-footer">
           <button id="saveBtn" class="btn primary">Save & Print</button>
+          <button id="saveImageBtn" class="btn">Save Image</button>
           <button id="saveDraftBtn" class="btn">Save Draft</button>
           <button id="updateBtn" class="btn is-hidden">Save Changes</button>
           <button id="printEditedBtn" class="btn is-hidden">Print</button>
