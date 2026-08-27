@@ -292,7 +292,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
     win.document.open();
-    win.document.write(html);
+    win.document.write(html.replace(/SHANKAR SAH/g, 'Shankar Vegetable Shop'));
     win.document.close();
     setTimeout(() => {
       try { win.focus(); win.print(); } catch (e) { console.warn('Print failed', e); }
@@ -481,7 +481,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="brand-block">
         <div class="logo-wrap"><img src="${logoPath}" alt="Logo"></div>
         <div class="company-info">
-          <h1>SHANKAR SAH</h1>
+          <h1>Shankar Vegetable Shop</h1>
           <p>Gamharia Market Complex • 832108</p>
           <p>Phone: 8210945932</p>
           <p>Email: shankarvegetableshop7@gmail.com</p>
@@ -535,7 +535,7 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
 
     <div class="signature-section">
-      <div class="signatory">SHANKAR SAH</div>
+      <div class="signatory">Shankar Vegetable Shop</div>
       <div class="auth-label">Authorized Signatory</div>
     </div>
 

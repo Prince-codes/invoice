@@ -243,165 +243,112 @@ body {
   font-family: 'Montserrat', sans-serif;
 }
 
-.toggle-password {
-    right: 6px;
-    height: 16px;
-    width: 16px;
-    font-size: 1rem;
-}
+@media (max-width: 700px) {
+  html,
+  body {
+    min-width: 0;
+    overflow-x: hidden;
+  }
 
-
-
-.login-container {
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 18px;
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  padding: 38px 28px 28px 28px;
-  width: 360px;
-  text-align: center;
-  position: relative;
-  margin: auto;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-/* Welcome back message for login container */
-.login-container::before {
-  content: "Welcome back! Please log in to continue.";
-  display: block;
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: #A100FF;
-  margin-bottom: 18px;
-  text-shadow: 0 0 8px #A100FF44;
-}
-}
-
-
-/* Password input and toggle styles */
-.password-wrapper {
+  .header-bar {
     position: relative;
+    top: auto;
+    left: auto;
     width: 100%;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-}
-
-.password-wrapper input[type="password"],
-.password-wrapper input[type="text"] {
-    width: 100%;
-    padding-right: 44px;
-    margin: 0 auto;
-}
-
-.toggle-password {
-    position: absolute;
-    right: 10px;
-    top: 30%;
-    transform: translateY(-50%);
-    background: rgba(0, 234, 255, 0.12);
-    border: none;
-    color: #00eaff;
-    font-size: 1.35rem;
-    cursor: pointer;
-    outline: none;
-    z-index: 2;
-    padding: 0;
-    height: 20px;
-    width: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
-    box-shadow: 0 2px 8px rgba(0, 234, 255, 0.08);
-}
-
-/* Hide default button styles for toggle */
-.toggle-password:active,
-.toggle-password:focus {
-    outline: none;
-    box-shadow: none;
-}
-
-.icon-circle {
-    position: absolute;
-    top: -42px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 70px;
-    height: 70px;
-    background: rgba(255, 255, 255, 0.12);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0 0 6px rgba(0, 255, 255, 0.08), 0 0 18px 2px #00eaff;
-    border: 2px solid rgba(255, 255, 255, 0.18);
-    z-index: 2;
-}
-
-.icon-circle i {
-    color: #00eaff;
-    font-size: 2rem;
-}
-
-
-input {
-    width: 100%;
-    padding: 12px 16px;
-    margin: 10px auto;
-    border: none;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.18);
-    color: #eaf6fb;
-    font-size: 1rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    outline: none;
-    transition: background 0.2s;
+    padding: 18px 20px;
     box-sizing: border-box;
-    text-align: left;
-    display: block;
-}
+    gap: 12px;
+  }
 
-input:focus {
-    background: rgba(0, 234, 255, 0.12);
-    color: #fff;
-}
+  .logo-header {
+    width: 44px;
+    height: 44px;
+    margin-right: 0;
+    flex: 0 0 auto;
+  }
 
+  .company-name {
+    min-width: 0;
+    font-size: clamp(1.15rem, 6vw, 1.7rem);
+    line-height: 1.15;
+    overflow-wrap: anywhere;
+  }
 
-button {
+  .split-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 80px);
+    overflow: visible;
+  }
+
+  .left-panel,
+  .right-panel {
+    min-width: 0;
     width: 100%;
-    padding: 12px;
-    background: linear-gradient(90deg, #00eaff 0%, #0078ff 100%);
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    font-weight: 600;
+    clip-path: none;
+    border-radius: 0;
+    box-sizing: border-box;
+  }
+
+  .left-panel {
+    min-height: 190px;
+    padding: 32px 24px 28px;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  .welcome-text {
+    position: static;
+    width: 100%;
+    max-width: 520px;
+    height: auto;
+    transform: none;
+    margin: 0 auto;
+  }
+
+  .welcome-text h1 {
+    margin: 0 0 10px;
+    font-size: clamp(1.65rem, 8vw, 2.2rem);
+  }
+
+  .welcome-text p {
+    margin: 0;
     font-size: 1rem;
-    cursor: pointer;
-    margin-top: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    transition: background 0.2s, box-shadow 0.2s;
+    line-height: 1.5;
+  }
+
+  .right-panel {
+    flex: 1;
+    padding: 58px 16px 32px;
+    align-items: flex-start;
+  }
+
+  .login-container,
+  .glass.login-container {
+    width: min(100%, 390px);
+    min-width: 0;
+    max-width: 390px;
+    padding: 42px 22px 24px;
+    margin: 0 auto;
+  }
 }
 
-button:hover {
-    background: linear-gradient(90deg, #0078ff 0%, #00eaff 100%);
-    box-shadow: 0 4px 16px rgba(0, 234, 255, 0.18);
-}
+@media (max-width: 380px) {
+  .header-bar {
+    padding-inline: 14px;
+  }
 
+  .left-panel {
+    min-height: 175px;
+    padding-inline: 18px;
+  }
 
-#errorMsg {
-    color: #ff4d4f;
-    margin-top: 12px;
-    font-size: 0.98rem;
-    letter-spacing: 0.5px;
+  .right-panel {
+    padding-inline: 10px;
+  }
+
+  .login-container,
+  .glass.login-container {
+    padding-inline: 18px;
+  }
 }
