@@ -64,7 +64,7 @@ body {
 .logo-glow {
   width: 72px;
   height: 72px;
-  border-radius: 14px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -75,13 +75,12 @@ body {
   border: 1px solid rgba(255,255,255,0.06);
 }
 
-.logo-glow .brand-logo {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  box-shadow: inset 0 3px 10px rgba(0,0,0,0.45), inset 0 -2px 6px rgba(255,255,255,0.03);
-  border-radius: 10px;
+.brand-logo {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.12);
+  box-shadow: 0 0 8px #00eaff44;
 }
 
 .brand h1 {
@@ -319,7 +318,7 @@ input:focus, select:focus {
 
 .item-row {
   display: grid;
-  grid-template-columns: 42px minmax(160px, 1.8fr) minmax(100px, .8fr) minmax(120px, 1fr) minmax(120px, 1fr) 72px;
+  grid-template-columns: 42px minmax(160px, 1.8fr) minmax(150px, 1.1fr) minmax(120px, 1fr) minmax(120px, 1fr) 72px;
   gap: 8px;
   align-items: center;
   padding: 8px;
@@ -330,13 +329,34 @@ input:focus, select:focus {
 
 .item-header {
   display: grid;
-  grid-template-columns: 42px minmax(160px, 1.8fr) minmax(100px, .8fr) minmax(120px, 1fr) minmax(120px, 1fr) 72px;
+  grid-template-columns: 42px minmax(160px, 1.8fr) minmax(150px, 1.1fr) minmax(120px, 1fr) minmax(120px, 1fr) 72px;
   gap: 8px;
   padding: 0 8px 5px;
   color: var(--muted);
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: .04em;
+}
+
+.item-quantity-wrap {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.item-quantity-wrap .item-quantity {
+  flex: 1 1 auto;
+}
+
+.item-quantity-wrap .item-unit {
+  width: 72px;
+  min-width: 72px;
+  padding: 10px 10px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: #fff;
+  font-size: 0.9rem;
 }
 
 .item-number {

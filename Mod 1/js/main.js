@@ -364,11 +364,12 @@ document.addEventListener('DOMContentLoaded', () => {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 14px;
+    border-radius: 50%;
     background: linear-gradient(135deg, #f59e0b, #fcd34d);
     box-shadow: 0 6px 20px rgba(245, 158, 11, 0.16);
+    overflow: hidden;
   }
-  .logo-wrap img { width: 54px; height: 54px; object-fit: contain; border-radius: 10px; }
+  .logo-wrap img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
   .company-info h1 { margin: 0 0 4px; font-size: 20px; letter-spacing: 1px; color: #111827; }
   .company-info p { margin: 2px 0; color: #6b7280; font-size: 12px; }
   .invoice-meta { min-width: 180px; text-align: right; display: flex; flex-direction: column; align-items: flex-end; }
