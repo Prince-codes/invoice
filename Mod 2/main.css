@@ -342,13 +342,18 @@ input:focus, select:focus {
   display: flex;
   gap: 6px;
   align-items: center;
+  width: 100%;
+  min-width: 0;
 }
 
 .item-quantity-wrap .item-quantity {
-  flex: 1 1 auto;
+  flex: 1 1 60%;
+  min-width: 0;
+  width: 100%;
 }
 
 .item-quantity-wrap .item-unit {
+  flex: 0 0 72px;
   width: 72px;
   min-width: 72px;
   padding: 10px 10px;
@@ -432,7 +437,7 @@ input:focus, select:focus {
     gap: 12px;
   }
   .item-row {
-    grid-template-columns: 34px 1fr 1fr;
+    grid-template-columns: 34px minmax(0, 1.2fr) minmax(0, 1fr);
   }
   .item-header {
     display: none;
@@ -440,14 +445,15 @@ input:focus, select:focus {
   .item-row .item-name {
     grid-column: 2 / 4;
   }
-  .item-row .item-quantity {
-    grid-column: 2;
+  .item-row .item-quantity-wrap {
+    grid-column: 2 / 4;
+    width: 100%;
   }
   .item-row .item-quote {
-    grid-column: 3;
+    grid-column: 2;
   }
   .item-row .item-price {
-    grid-column: 2;
+    grid-column: 3;
   }
   .item-row .remove-item {
     grid-column: 3;
@@ -621,23 +627,24 @@ input:focus, select:focus {
   }
 
   .item-row {
-    grid-template-columns: 36px minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-columns: 36px minmax(0, 1.35fr) minmax(0, 1fr);
   }
 
   .item-row .item-name {
     grid-column: 2 / 4;
   }
 
-  .item-row .item-quantity {
-    grid-column: 2;
+  .item-row .item-quantity-wrap {
+    grid-column: 2 / 4;
+    width: 100%;
   }
 
   .item-row .item-quote {
-    grid-column: 3;
+    grid-column: 2;
   }
 
   .item-row .item-price {
-    grid-column: 2;
+    grid-column: 3;
   }
 
   .item-row .remove-item {
