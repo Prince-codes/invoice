@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Invoice Generator — Shankar Vegetable Shop</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="main.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="brand">
+      <div class="brand-left">
+      <div><img src="../Assets/logo.png" alt="logo" class="brand-logo"></div>
+        <div>
+          <h1>Shankar Vegetable Shop</h1>
+          <p class="muted">Gamharia market complex - 832108</p>
+        </div>
+      </div>
+      <div class="brand-right">
+        <div id="userDisplay" class="muted"></div>
+        <button id="exportCsvBtn" class="btn" title="Export all invoices as CSV">Export CSV</button>
+        <button id="logoutBtn" class="btn">Logout</button>
+      </div>
+    </header>
+
+    <section class="card">
+      <h2>Create New Bill</h2>
+
+      <div class="form-grid">
+        <label>
+          Customer Name
+          <input id="customer" placeholder="Enter customer name" />
+        </label>
+
+        <label>
+          Bill of Date
+          <input id="billingDate" type="date" />
+        </label>
+      </div>
+
+      <div class="actions">
+        <button id="openBtn" class="btn primary">Open Bill Editor</button>
+        <button id="viewPreviousBtn">View Previous Bills</button>
+      </div>
+    </section>
+
+    <footer class="footer muted">&copy; 2026 Carnage Sentinels. All rights reserved.</footer>
+
+    <!-- Modal -->
+    <div id="modal" class="modal" aria-hidden="true">
+      <div class="modal-content">
+        <header>
+          <h3 id="modalTitle">Enter bill items</h3>
+          <button id="closeModal" class="close" title="Close">&times;</button>
+        </header>
+
+        <div class="modal-body">
+          <div class="items-toolbar">
+            <span>Bill Items</span>
+          </div>
+          <div class="item-header" aria-hidden="true">
+            <span>Sr. No.</span><span>Item Name</span><span>Qty / Unit</span><span>Quote Price</span><span>Price</span><span></span>
+          </div>
+          <div id="tablesContainer"></div>
+
+          <div class="modal-summary">
+            <label class="dues-field">
+              Previous Dues
+              <input id="previousDues" type="number" min="0" step="0.01" placeholder="0.00" />
+            </label>
+            <div class="total-all">Total Amount: <span id="totalAll">0.00</span></div>
+          </div>
+
+          <label>
+            Total Amount in Words
+            <input id="amountWords" placeholder="E.g., Five Thousand Only" />
+          </label>
+        </div>
+
+        <footer class="modal-footer">
+          <button id="saveBtn" class="btn primary">Save & Print</button>
+          <button id="saveImageBtn" class="btn">Save Image</button>
+          <button id="saveDraftBtn" class="btn">Save Draft</button>
+          <button id="updateBtn" class="btn is-hidden">Save Changes</button>
+          <button id="printEditedBtn" class="btn is-hidden">Print</button>
+          <button id="cancelBtn" class="btn">Cancel</button>
+        </footer>
+      </div>
+    </div>
+
+    <!-- Modal for previous bills -->
+    <div id="previousBillsModal" class="modal previous-bills-modal">
+    <div class="modal-content">
+      <header class="previous-bills-header">
+        <h3 class="previous-bills-title">Previous Bills</h3>
+        <button class="close" id="closePreviousModal" title="Close">&times;</button>
+      </header>
+      <div class="modal-body previous-bills-body">
+        <table id="previousBillsTable" class="previous-bills-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Customer</th>
+              <th>Bill of Date</th>
+              <th>Total</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Filled dynamically -->
+          </tbody>
+        </table>
+        <div class="previous-bills-note">
+          <small>Click any row to open & print that invoice.</small>
+        </div>
+      </div>
+    </div>
+    </div>
+
+  </main>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

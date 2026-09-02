@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Select Bill Type - Shankar Vegetable Shop</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="selection.css">
+</head>
+<body>
+  <main class="selection-page">
+    <header class="topbar">
+      <a class="brand" href="selection.html" aria-label="Shankar Vegetable Shop home">
+        <span class="logo-frame"><img src="../Assets/logo.png" alt="Shankar Vegetable Shop logo"></span>
+        <span class="brand-info">
+          <span class="brand-name">Shankar Vegetable Shop</span>
+          <span class="brand-address">Gamharia market complex - 832108</span>
+        </span>
+      </a>
+      <button id="logoutBtn" class="logout-btn" type="button">Log out</button>
+    </header>
+
+    <section class="intro" aria-labelledby="pageTitle">
+      <p class="eyebrow">Invoice workspace</p>
+      <h2 id="pageTitle">Choose your bill type</h2>
+      <p class="intro-copy">Select the billing workflow you want to open.</p>
+    </section>
+
+    <section class="options" aria-label="Bill type options">
+      <a class="option-card monthly-card" href="../Mod%201/main.html">
+        <span class="card-number">01</span>
+        <span class="card-icon" aria-hidden="true">MONTH</span>
+        <span class="card-content">
+          <span class="card-title">Create Monthly Bill</span>
+          <span class="card-description">Track daily amounts across a complete month.</span>
+        </span>
+        <span class="card-arrow" aria-hidden="true">&#8599;</span>
+      </a>
+
+      <a class="option-card date-card" href="../Mod%202/main.html">
+        <span class="card-number">02</span>
+        <span class="card-icon" aria-hidden="true">DATE</span>
+        <span class="card-content">
+          <span class="card-title">Create Date Bill</span>
+          <span class="card-description">Create a focused invoice for one billing date.</span>
+        </span>
+        <span class="card-arrow" aria-hidden="true">&#8599;</span>
+      </a>
+
+      <a class="option-card mod3-card" href="../Mod%203/main.html">
+        <span class="card-number">03</span>
+        <span class="card-icon" aria-hidden="true">MOD 3</span>
+        <span class="card-content">
+          <span class="card-title">Old Method Invoice Generator</span>
+          <span class="card-description">Open the Mod 3 invoice workflow.</span>
+        </span>
+        <span class="card-arrow" aria-hidden="true">&#8599;</span>
+      </a>
+    </section>
+
+  </main>
+  <script src="selection.js"></script>
+</body>
+</html>

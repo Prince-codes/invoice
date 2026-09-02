@@ -1,0 +1,336 @@
+:root {
+  --ink: #f8fbff;
+  --muted: #aab6c9;
+  --background: #0d0d0d;
+  --panel: rgba(255, 255, 255, 0.08);
+  --cyan: #00e5ff;
+  --violet: #a100ff;
+  --pink: #ff4dd2;
+  --line: rgba(255, 255, 255, 0.14);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--ink);
+  font-family: 'Montserrat', sans-serif;
+  background:
+    radial-gradient(circle at 15% 12%, rgba(0, 229, 255, 0.13), transparent 28rem),
+    radial-gradient(circle at 86% 86%, rgba(161, 0, 255, 0.18), transparent 30rem),
+    linear-gradient(180deg, #0d0d0d 0%, #1a0033 100%);
+}
+
+body::before {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 42px 42px;
+  content: '';
+  mask-image: linear-gradient(to bottom, black, transparent 80%);
+}
+
+.selection-page {
+  width: min(1040px, calc(100% - 48px));
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 24px 0 22px;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar,
+.brand,
+.brand-info,
+.options,
+.option-card {
+  display: flex;
+}
+
+.topbar {
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  align-items: center;
+  gap: 16px;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.logo-frame {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.12);
+  box-shadow: 0 0 8px #00eaff44;
+}
+
+.logo-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
+}
+
+.brand-info {
+  flex-direction: column;
+  gap: 5px;
+}
+
+.brand-name {
+  font-size: clamp(1.35rem, 2.4vw, 1.8rem);
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  color: var(--violet);
+  text-shadow: 0 2px 8px #00eaff44;
+}
+
+.brand-address {
+  color: var(--muted);
+  font-size: .8rem;
+}
+
+.logout-btn {
+  padding: 10px 17px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: border-color .2s, color .2s, background .2s;
+}
+
+.logout-btn:hover {
+  border-color: var(--cyan);
+  color: var(--ink);
+  background: rgba(0, 229, 255, 0.08);
+}
+
+.intro {
+  margin: 72px 0 34px;
+  animation: reveal .65s ease both;
+}
+
+.eyebrow {
+  margin: 0 0 16px;
+  color: var(--cyan);
+  font-size: .74rem;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+h1 {
+  max-width: 650px;
+  margin: 0;
+  font-size: clamp(2.2rem, 5vw, 4.3rem);
+  line-height: .98;
+  letter-spacing: 0;
+}
+
+.intro-copy {
+  margin: 24px 0 0;
+  color: var(--muted);
+  font-size: 1rem;
+}
+
+.options {
+  gap: 22px;
+}
+
+.option-card {
+  position: relative;
+  flex: 1;
+  min-height: 220px;
+  aspect-ratio: 1.8;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+  padding: 24px;
+  border: 1.5px solid rgba(161, 0, 255, 0.18);
+  border-radius: 18px;
+  color: var(--ink);
+  text-decoration: none;
+  background: linear-gradient(135deg, rgba(106, 0, 255, 0.12), rgba(0, 229, 255, 0.08));
+  box-shadow: 0 0 32px 0 rgba(161, 0, 255, 0.18);
+  backdrop-filter: blur(18px);
+  isolation: isolate;
+  transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+  animation: reveal .65s ease both;
+}
+
+.option-card::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  content: '';
+  opacity: .8;
+  transition: opacity .25s;
+}
+
+.monthly-card::before {
+  background: linear-gradient(145deg, rgba(0, 229, 255, .22), transparent 56%);
+}
+
+.date-card::before {
+  background: linear-gradient(145deg, rgba(255, 77, 210, .2), transparent 56%);
+}
+
+.option-card:nth-child(2) {
+  animation-delay: .1s;
+}
+
+.option-card:hover {
+  transform: translateY(-8px);
+  border-color: rgba(0, 229, 255, .7);
+  box-shadow: 0 24px 60px rgba(0, 229, 255, .12);
+}
+
+.date-card:hover {
+  border-color: rgba(255, 77, 210, .7);
+  box-shadow: 0 24px 60px rgba(255, 77, 210, .12);
+}
+
+.card-number {
+  position: absolute;
+  top: 25px;
+  right: 28px;
+  color: rgba(255, 255, 255, .38);
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.card-icon {
+  display: block;
+  margin-bottom: auto;
+  color: var(--cyan);
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: 3px;
+  line-height: 1;
+  text-shadow: 0 0 20px rgba(0, 229, 255, .55);
+}
+
+.date-card .card-icon {
+  color: var(--pink);
+  text-shadow: 0 0 20px rgba(255, 77, 210, .45);
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 390px;
+}
+
+.card-title {
+  font-size: clamp(1.35rem, 2.3vw, 2rem);
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.card-description {
+  color: var(--muted);
+  font-size: .9rem;
+  line-height: 1.6;
+}
+
+.card-arrow {
+  position: absolute;
+  right: 28px;
+  bottom: 27px;
+  color: var(--cyan);
+  font-size: 1.6rem;
+  transition: transform .25s;
+}
+
+.date-card .card-arrow {
+  color: var(--pink);
+}
+
+.option-card:hover .card-arrow {
+  transform: translate(4px, -4px);
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 700px) {
+  .selection-page {
+    width: min(100% - 32px, 540px);
+    padding-top: 18px;
+  }
+
+  .logo-frame {
+    flex-basis: 60px;
+    width: 60px;
+    height: 60px;
+  }
+
+  .brand {
+    gap: 12px;
+  }
+
+  .brand-name {
+    font-size: 1.2rem;
+  }
+
+  .brand-address {
+    font-size: .68rem;
+  }
+
+  .intro {
+    margin: 64px 0 28px;
+  }
+
+  h1 {
+    font-size: clamp(2.25rem, 12vw, 3.7rem);
+  }
+
+  .options {
+    flex-direction: column;
+  }
+
+  .option-card {
+    min-height: 182px;
+    aspect-ratio: auto;
+    padding: 20px;
+  }
+
+  .card-title {
+    font-size: 1.25rem;
+  }
+
+  .card-description {
+    max-width: 260px;
+    font-size: .82rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}
