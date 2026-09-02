@@ -38,8 +38,10 @@ document.addEventListener('DOMContentLoaded', () => {
   let editingInvoiceId = null;
   let saveInProgress = false;
 
-  // CSV export button
+  // CSV import/export buttons
   const exportCsvBtn = document.getElementById('exportCsvBtn');
+  const importCsvBtn = document.getElementById('importCsvBtn');
+  const importCsvInput = document.getElementById('importCsv');
 
   // populate month/year
   const monthNames = [
@@ -222,6 +224,17 @@ document.addEventListener('DOMContentLoaded', () => {
     let id = Number(localStorage.getItem('nextInvoiceId') || '1');
     localStorage.setItem('nextInvoiceId', String(id + 1));
     return id;
+  function makeInvoiceNumber(customerName, invoiceDate = new Date()) {
+    const customerPart = String(customerName || 'CUSTOMER')
+      .trim()
+      .replace(/[^a-z0-9]+/gi, '-')
+      .replace(/^-|-$/g, '')
+      .toUpperCase() || 'CUSTOMER';
+    const year = invoiceDate.getFullYear();
+    const month = String(invoiceDate.getMonth() + 1).padStart(2, '0');
+    const day = String(invoiceDate.getDate()).padStart(2, '0');
+    return `${customerPart}-${year}-${month}-${day}`;
+  }
   }
 
   function saveInvoiceToStorage(inv) {
@@ -237,6 +250,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // build CSV header and rows (simple, daily is JSON encoded)
     const header = ['invoiceId', 'customerName', 'monthYearISO', 'monthText', 'total', 'totalWords', 'createdAt', 'createdBy', 'daily_json'];
     const rows = invoices.map(inv => {
+      const dailyJson = JSON.stringify(Array.isArray(inv.daily) ? inv.daily : []).replace(/"/g, '""');
+      const customerName = String(inv.customerName || '');
+      const monthText = String(inv.monthText || inv.monthYearISO || '');
+      return [
+        inv.invoiceId,
+        customerName.replace(/"/g, '""'),
+        inv.monthYearISO || '',
+        monthText.replace(/"/g, '""'),
       const dailyJson = JSON.stringify(Array.isArray(inv.daily) ? inv.daily : []).replace(/"/g, '""');
       const customerName = String(inv.customerName || '');
       const monthText = String(inv.monthText || inv.monthYearISO || '');
@@ -285,6 +306,8 @@ document.addEventListener('DOMContentLoaded', () => {
       alert('Please allow pop-ups to print the invoice.');
       return;
     }
+    win.document.open();
+    win.document.write(html.replace(/SHANKAR SAH/g, 'Shankar Vegetable Shop'));
     win.document.open();
     win.document.write(html.replace(/SHANKAR SAH/g, 'Shankar Vegetable Shop'));
     win.document.close();
@@ -358,6 +381,11 @@ document.addEventListener('DOMContentLoaded', () => {
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #f59e0b, #fcd34d);
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.16);
+  }
+  .logo-wrap img { width: 54px; height: 54px; object-fit: contain; border-radius: 10px; }
     border-radius: 50%;
     background: linear-gradient(135deg, #f59e0b, #fcd34d);
     box-shadow: 0 6px 20px rgba(245, 158, 11, 0.16);
@@ -458,7 +486,7 @@ document.addEventListener('DOMContentLoaded', () => {
   .signature-section { margin-top: 36px; text-align: right; }
   .signatory { display: inline-block; padding-top: 7px; border-top: 2px solid #111827; font-size: 13px; font-weight: 700; }
   .auth-label { margin-top: 4px; color: #6b7280; font-size: 11px; }
-  .footer-note { margin-top: 18px; text-align: center; color: #374151; font-size: 14px; font-weight: 700; }
+  .footer-note { margin-top: 18px; text-align: center; color: #6b7280; font-size: 11px; }
   @media print {
     body { background: #fff; margin: 0; padding: 0; }
     .invoice-shell { box-shadow: none; border-radius: 0; padding: 0; width: 100%; max-width: none; }
@@ -618,6 +646,98 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // CSV import: user chooses a CSV; we parse and merge into storage
+  if (importCsvBtn && importCsvInput) {
+    importCsvBtn.addEventListener('click', () => importCsvInput.click());
+    importCsvInput.addEventListener('change', (e) => {
+    const f = e.target.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = function (evt) {
+      const text = evt.target.result;
+      try {
+        const parsed = parseInvoicesCsv(text);
+        if (parsed.length === 0) { alert('No invoices found in CSV.'); return; }
+        // merge — avoid duplicate invoiceId (if id exists, skip)
+        const existing = loadInvoicesFromStorage();
+        const existingIds = new Set(existing.map(i => i.invoiceId));
+        parsed.forEach(p => {
+          if (!existingIds.has(p.invoiceId)) existing.push(p);
+        });
+        localStorage.setItem('invoices', JSON.stringify(existing));
+        // make sure nextInvoiceId is larger than any existing id
+        const maxId = existing.reduce((mx, it) => Math.max(mx, Number(it.invoiceId || 0)), 0);
+        localStorage.setItem('nextInvoiceId', String(maxId + 1));
+        updateCsvCache();
+        alert('Imported invoices. You can now view previous bills.');
+      } catch (err) {
+        console.error(err);
+        alert('Failed to parse CSV.');
+      }
+    };
+      reader.readAsText(f);
+      // reset input
+      importCsvInput.value = '';
+    });
+  }
+
+  function parseInvoicesCsv(text) {
+    // Very straightforward parser expecting the CSV format created by updateCsvCache()
+    // Header: invoiceId,customerName,monthYearISO,monthText,total,totalWords,createdAt,createdBy,daily_json
+    const lines = text.split(/\r?\n/).filter(Boolean);
+    if (lines.length < 2) return [];
+    const res = [];
+    for (let i = 1; i < lines.length; i++) {
+      // naive split to get first 8 columns then the final daily_json (which may contain commas/newlines encoded)
+      // Since daily_json is quoted, find the first quote after 8 commas
+      const line = lines[i];
+      // We'll split by comma, but handle quoted last field
+      const parts = [];
+      let cur = '';
+      let inQuotes = false;
+      for (let ch of line) {
+        if (ch === '"') {
+          inQuotes = !inQuotes;
+          cur += ch;
+        } else if (ch === ',' && !inQuotes) {
+          parts.push(cur);
+          cur = '';
+        } else {
+          cur += ch;
+        }
+      }
+      if (cur !== '') parts.push(cur);
+      // normalize parts length
+      while (parts.length < 9) parts.push('');
+      // map
+      const invoiceId = Number(parts[0]) || undefined;
+      const customerName = (parts[1] || '').replace(/""/g, '"').replace(/^"|"$/g, '');
+      const monthYearISO = (parts[2] || '');
+      const monthText = (parts[3] || '').replace(/""/g, '"').replace(/^"|"$/g, '');
+      const total = parts[4] || '';
+      const totalWords = (parts[5] || '').replace(/""/g, '"').replace(/^"|"$/g, '');
+      const createdAt = parts[6] || '';
+      const createdBy = (parts[7] || '').replace(/""/g, '"').replace(/^"|"$/g, '');
+      let daily_json = parts.slice(8).join(',') || '';
+      // strip surrounding quotes from daily_json and unescape double quotes
+      daily_json = daily_json.replace(/^"|"$/g, '').replace(/""/g, '"');
+      let daily = [];
+      try { daily = JSON.parse(daily_json); } catch (e) { daily = []; }
+      const invoice = {
+        invoiceId,
+        customerName,
+        monthYearISO,
+        monthText,
+        totals: { grand: Number(total || 0) },
+        totalWords,
+        createdAt,
+        createdBy,
+        daily
+      };
+      res.push(invoice);
+    }
+    return res;
+  }
   // initially ensure CSV cache exists
   if (!localStorage.getItem('invoices_csv')) updateCsvCache();
 
@@ -763,6 +883,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     saveInvoiceToStorage(invoiceObj);
     updateCsvCache();
+    modal.classList.remove('show');
     close();
     if (!asDraft) openPrintWindow(invoiceObj);
     saveInProgress = false;

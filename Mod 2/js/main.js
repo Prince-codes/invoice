@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const itemTotal = items.reduce((sum, item) => sum + item.price, 0);
     const total = itemTotal + (Number.isFinite(previousDues) && previousDues >= 0 ? previousDues : 0);
     const customerName = customerInput.value.trim();
-    const invoiceNumber = editingInvoiceId || getNextInvoiceId();
+    const invoiceNumber = makeInvoiceNumber(customerName, new Date(`${billingDateInput.value}T00:00:00`));
     return { invoiceId: editingInvoiceId || invoiceNumber, invoiceNumber, customerName, billingDate: billingDateInput.value, dateText: formatDate(billingDateInput.value), items, previousDues: Number(previousDues.toFixed(2)), total: Number(total.toFixed(2)), totals: { grand: Number(total.toFixed(2)) }, totalWords: amountWords.value || numberToWords(Math.round(total)), createdAt: new Date().toISOString(), createdBy: loggedIn || '' };
   }
 
@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function csvValue(value) { return `"${String(value).replace(/"/g, '""')}"`; }
   function updateCsvCache() {
     const header = ['invoiceId', 'invoiceNumber', 'customerName', 'billingDate', 'dateText', 'previousDues', 'total', 'totalWords', 'createdAt', 'createdBy', 'items_json'];
-    const rows = loadInvoices().map(invoice => [invoice.invoiceId, csvValue(invoice.invoiceNumber || invoice.invoiceId || ''), csvValue(invoice.customerName), invoice.billingDate || '', csvValue(invoice.dateText || ''), Number(invoice.previousDues || 0), invoice.total || 0, csvValue(invoice.totalWords || ''), invoice.createdAt || '', csvValue(invoice.createdBy || ''), csvValue(JSON.stringify(invoice.items || []))].join(','));
+    const rows = loadInvoices().map(invoice => [invoice.invoiceId, csvValue(invoice.invoiceNumber || makeInvoiceNumber(invoice.customerName, new Date(`${invoice.billingDate}T00:00:00`))), csvValue(invoice.customerName), invoice.billingDate || '', csvValue(invoice.dateText || ''), Number(invoice.previousDues || 0), invoice.total || 0, csvValue(invoice.totalWords || ''), invoice.createdAt || '', csvValue(invoice.createdBy || ''), csvValue(JSON.stringify(invoice.items || []))].join(','));
     localStorage.setItem('invoices_csv', [header.join(','), ...rows].join('\n'));
   }
   function showPreviousBills() {
@@ -235,7 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function buildPrintHTML(invoice) {
     const items = invoice.items || [];
     const total = Number(invoice.total || invoice.totals?.grand || 0).toFixed(2);
-    const invoiceNumber = invoice.invoiceNumber || invoice.invoiceId || '';
+    const invoiceNumber = invoice.invoiceNumber || makeInvoiceNumber(invoice.customerName, new Date(`${invoice.billingDate}T00:00:00`));
     const rows = items.map((item, index) => `<tr><td>${index + 1}</td><td>${escapeHtml(item.name)}</td><td class="number">${Number(item.quantity).toFixed(2)} ${escapeHtml(item.unit || 'Kg')}</td><td class="number">₹ ${Number(item.quotePrice).toFixed(2)}</td><td class="number">₹ ${Number(item.price).toFixed(2)}</td></tr>`).join('');
     return `<!doctype html><html><head><meta charset="utf-8"><title>Invoice ${escapeHtml(invoiceNumber)}</title><style>@page{size:A4;margin:12mm}*{box-sizing:border-box}body{margin:0;color:#172033;font:13px Montserrat,'Segoe UI',sans-serif}.invoice{max-width:190mm;margin:auto}.header{display:flex;justify-content:space-between;gap:20px;border-bottom:3px solid #d9902f;padding-bottom:14px}.brand{display:flex;gap:12px;align-items:center}.logo{width:64px;height:64px;border-radius:50%;object-fit:cover}.company h1{margin:0 0 4px;font-size:20px;letter-spacing:1px}.company p{margin:3px 0;color:#657083;font-size:11px}.meta{text-align:right;color:#657083}.meta strong{display:block;color:#172033;font-size:15px;margin-bottom:8px}.bill-to{display:flex;justify-content:space-between;margin:22px 0 16px;padding:12px;background:#f5f7f9;border-left:4px solid #d9902f}.bill-to span{display:block;color:#657083;font-size:10px;text-transform:uppercase}.bill-to strong{font-size:16px}.items{width:100%;border-collapse:collapse}.items th{background:#172033;color:#fff}.items th,.items td{padding:10px 9px;border-bottom:1px solid #dce1e8;text-align:left}.items .number{text-align:right;font-variant-numeric:tabular-nums}.items tfoot td{font-weight:700;background:#f5f7f9}.summary{display:flex;justify-content:space-between;gap:20px;margin-top:22px;padding:14px;background:#f5f7f9}.grand{font-size:17px;font-weight:700}.grand .dues{display:block;font-size:13px;font-weight:600;color:#657083;margin-bottom:5px}.grand strong{display:block;font-size:21px}.words{max-width:55%;color:#657083}.words strong{display:block;color:#172033;margin-bottom:5px}.signature{text-align:right;margin-top:48px;font-weight:700}.signature span{display:block;border-top:2px solid #172033;padding-top:7px}.footer{text-align:center;color:#657083;margin-top:28px;font-size:15px;font-weight:600}@media print{.invoice{max-width:none}.items{break-inside:avoid}.summary{break-inside:avoid}}</style></head><body><main class="invoice"><header class="header"><div class="brand"><img class="logo" src="./logo.png" alt="Logo"><div class="company"><h1>Shankar Vegetable Shop</h1><p>Gamharia Market Complex - 832108</p><p>Phone: 8210945932</p><p>Email: shankarvegetableshop7@gmail.com</p></div></div><div class="meta"><strong>Invoice ${escapeHtml(invoiceNumber)}</strong><div>Bill of Date: ${escapeHtml(invoice.dateText || invoice.billingDate || '')}</div></div></header><section class="bill-to"><div><span>Bill To</span><strong>${escapeHtml(invoice.customerName)}</strong></div></section><table class="items"><thead><tr><th>Sr. No.</th><th>Item Name</th><th class="number">Quantity</th><th class="number">Quote Price</th><th class="number">Price</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><td colspan="4">Total Amount</td><td class="number">₹ ${total}</td></tr></tfoot></table><section class="summary"><div class="grand">Total Amount: ₹ ${total}</div><div class="words"><strong>Total Amount in Words</strong>${escapeHtml(invoice.totalWords || '')}</div></section><div class="signature"><span>SHANKAR SAH</span>Authorized Signatory</div><div class="footer">Thank You - Visit Us Again.</div></main></body></html>`;
   }
@@ -249,6 +249,18 @@ document.addEventListener('DOMContentLoaded', () => {
     let id = Number(localStorage.getItem('nextInvoiceId') || '1');
     localStorage.setItem('nextInvoiceId', String(id + 1));
     return id;
+  }
+  function makeInvoiceNumber(customerName, invoiceDate = new Date()) {
+    const customerPart = String(customerName || 'CUSTOMER')
+      .trim()
+      .replace(/[^a-z0-9]+/gi, '-')
+      .replace(/^-|-$/g, '')
+      .toUpperCase() || 'CUSTOMER';
+    const year = invoiceDate.getFullYear();
+    const month = String(invoiceDate.getMonth() + 1).padStart(2, '0');
+    const day = String(invoiceDate.getDate()).padStart(2, '0');
+    return `${customerPart}-${year}-${month}-${day}`;
+  }
   }
   function escapeHtml(value) { return String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char])); }
   function escapeAttribute(value) { return escapeHtml(value); }

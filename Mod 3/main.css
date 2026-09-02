@@ -64,7 +64,11 @@ body {
 .logo-glow {
   width: 72px;
   height: 72px;
+<<<<<<<< HEAD:Mod 3/main.css
   border-radius: 14px;
+========
+  border-radius: 50%;
+>>>>>>>> d71087d082ca1400d036abc4565a6b886367da13:Mod 1/main.css
   display: flex;
   align-items: center;
   justify-content: center;
@@ -75,6 +79,7 @@ body {
   border: 1px solid rgba(255,255,255,0.06);
 }
 
+<<<<<<<< HEAD:Mod 3/main.css
 .logo-glow .brand-logo {
   width: 100%;
   height: 100%;
@@ -82,6 +87,14 @@ body {
   display: block;
   box-shadow: inset 0 3px 10px rgba(0,0,0,0.45), inset 0 -2px 6px rgba(255,255,255,0.03);
   border-radius: 10px;
+========
+.brand-logo {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.12);
+  box-shadow: 0 0 8px #00eaff44;
+>>>>>>>> d71087d082ca1400d036abc4565a6b886367da13:Mod 1/main.css
 }
 
 .brand h1 {
@@ -249,6 +262,22 @@ input:focus, select:focus {
   margin-top: 12px;
 }
 
+<<<<<<<< HEAD:Mod 3/main.css
+========
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+
+.modal-footer .btn {
+  width: auto;
+  min-width: 120px;
+}
+
+>>>>>>>> d71087d082ca1400d036abc4565a6b886367da13:Mod 1/main.css
 .previous-bills-header {
   display: flex;
   justify-content: space-between;
@@ -398,9 +427,207 @@ input:focus, select:focus {
   .modal-content { padding: 14px; }
   .logo-glow { width: 48px; height: 48px; }
   .brand h1 { font-size: 1.1rem; }
+<<<<<<<< HEAD:Mod 3/main.css
   .site-header-inner h1 { font-size: 1rem; }
+========
+>>>>>>>> d71087d082ca1400d036abc4565a6b886367da13:Mod 1/main.css
   .daily-table { min-width: 100%; }
   #previousBillsTable { width: 100%; }
   .actions { gap: 8px; flex-direction: column; }
   .btn { width: 100%; }
+<<<<<<<< HEAD:Mod 3/main.css
+========
+  .modal-footer { flex-direction: column; }
+  .modal-footer .btn { width: 100%; }
+}
+
+/* Final layout constraints for the monthly editor */
+.app-shell {
+  width: min(1100px, calc(100% - 32px));
+  min-height: calc(100vh - 32px);
+  margin: 16px auto;
+  padding: clamp(14px, 2vw, 24px);
+}
+
+.brand {
+  margin-bottom: 24px;
+  padding: clamp(14px, 2vw, 20px);
+}
+
+.brand-left {
+  min-width: 0;
+}
+
+.brand-left > div:last-child {
+  min-width: 0;
+}
+
+.brand h1,
+.brand .muted {
+  overflow-wrap: anywhere;
+}
+
+.brand-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.brand-right .muted {
+  margin-right: 4px;
+}
+
+.card {
+  margin-top: 0;
+  padding: clamp(18px, 3vw, 28px);
+}
+
+.card h2 {
+  margin-bottom: 22px;
+  font-size: clamp(1.35rem, 2.5vw, 1.8rem);
+}
+
+.form-grid {
+  grid-template-columns: minmax(0, 1fr) minmax(150px, 0.42fr) minmax(120px, 0.34fr);
+  gap: clamp(12px, 2vw, 18px);
+}
+
+.form-grid input,
+.form-grid select {
+  min-width: 0;
+  width: 100%;
+}
+
+.actions {
+  align-items: center;
+}
+
+.actions .btn,
+#viewPreviousBtn {
+  min-height: 44px;
+}
+
+.modal {
+  padding: 16px;
+}
+
+.modal-content {
+  width: min(1000px, 100%);
+  max-height: min(88vh, 900px);
+  padding: clamp(16px, 3vw, 28px);
+}
+
+#tablesContainer {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: clamp(12px, 2vw, 18px);
+}
+
+.daily-table {
+  min-width: 0;
+  width: 100%;
+  padding: 10px;
+}
+
+.daily-table th,
+.daily-table td {
+  padding: 8px 7px;
+  vertical-align: middle;
+}
+
+.daily-table th:first-child,
+.daily-table td:first-child {
+  width: 16%;
+}
+
+.daily-table th:nth-child(2),
+.daily-table td:nth-child(2) {
+  width: 40%;
+}
+
+.daily-table th:last-child,
+.daily-table td:last-child {
+  width: 44%;
+}
+
+.daily-table input {
+  min-width: 0;
+  width: 100%;
+}
+
+.modal-summary {
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 10px 4px;
+}
+
+@media (max-width: 860px) {
+  .app-shell {
+    width: min(100% - 24px, 680px);
+    margin: 12px auto;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .brand-right {
+    justify-content: flex-start;
+  }
+
+  #tablesContainer {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-shell {
+    width: calc(100% - 16px);
+    margin: 8px auto;
+    padding: 10px;
+  }
+
+  .brand {
+    padding: 12px;
+  }
+
+  .brand-right {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+  }
+
+  .brand-right .muted {
+    grid-column: 1 / -1;
+  }
+
+  .brand-right .btn {
+    width: 100%;
+    min-width: 0;
+    padding: 11px 8px;
+    font-size: .78rem;
+  }
+
+  .modal {
+    padding: 8px;
+  }
+
+  .modal-content {
+    max-height: 94vh;
+    border-radius: 14px;
+  }
+
+  .modal-summary {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .modal-summary .total-all {
+    grid-column: 1 / -1;
+  }
+>>>>>>>> d71087d082ca1400d036abc4565a6b886367da13:Mod 1/main.css
 }
