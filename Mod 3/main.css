@@ -64,11 +64,7 @@ body {
 .logo-glow {
   width: 72px;
   height: 72px;
-<<<<<<<< HEAD:Mod 3/main.css
-  border-radius: 14px;
-========
   border-radius: 50%;
->>>>>>>> d71087d082ca1400d036abc4565a6b886367da13:Mod 1/main.css
   display: flex;
   align-items: center;
   justify-content: center;
@@ -79,22 +75,12 @@ body {
   border: 1px solid rgba(255,255,255,0.06);
 }
 
-<<<<<<<< HEAD:Mod 3/main.css
-.logo-glow .brand-logo {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  box-shadow: inset 0 3px 10px rgba(0,0,0,0.45), inset 0 -2px 6px rgba(255,255,255,0.03);
-  border-radius: 10px;
-========
 .brand-logo {
   width: 76px;
   height: 76px;
   border-radius: 50%;
   background: rgba(255,255,255,0.12);
   box-shadow: 0 0 8px #00eaff44;
->>>>>>>> d71087d082ca1400d036abc4565a6b886367da13:Mod 1/main.css
 }
 
 .brand h1 {
@@ -262,8 +248,6 @@ input:focus, select:focus {
   margin-top: 12px;
 }
 
-<<<<<<<< HEAD:Mod 3/main.css
-========
 .modal-footer {
   display: flex;
   justify-content: flex-end;
@@ -277,7 +261,6 @@ input:focus, select:focus {
   min-width: 120px;
 }
 
->>>>>>>> d71087d082ca1400d036abc4565a6b886367da13:Mod 1/main.css
 .previous-bills-header {
   display: flex;
   justify-content: space-between;
@@ -427,16 +410,10 @@ input:focus, select:focus {
   .modal-content { padding: 14px; }
   .logo-glow { width: 48px; height: 48px; }
   .brand h1 { font-size: 1.1rem; }
-<<<<<<<< HEAD:Mod 3/main.css
-  .site-header-inner h1 { font-size: 1rem; }
-========
->>>>>>>> d71087d082ca1400d036abc4565a6b886367da13:Mod 1/main.css
   .daily-table { min-width: 100%; }
   #previousBillsTable { width: 100%; }
   .actions { gap: 8px; flex-direction: column; }
   .btn { width: 100%; }
-<<<<<<<< HEAD:Mod 3/main.css
-========
   .modal-footer { flex-direction: column; }
   .modal-footer .btn { width: 100%; }
 }
@@ -629,5 +606,4 @@ input:focus, select:focus {
   .modal-summary .total-all {
     grid-column: 1 / -1;
   }
->>>>>>>> d71087d082ca1400d036abc4565a6b886367da13:Mod 1/main.css
 }
