@@ -262,32 +262,36 @@ document.addEventListener('DOMContentLoaded', () => {
     const win = window.open('', '_blank');
     if (!win) return alert('Please allow pop-ups to print the invoice.');
     win.document.open();
+    const itemTotal = (invoice.items || []).reduce((sum, item) => sum + Number(item.price || 0), 0);
+    const previousDues = Number(invoice.previousDues || 0);
+    const grandTotal = itemTotal + previousDues;
     let printHtml = buildPrintHTML(invoice)
       .replace('<th class="number">Quantity</th>', '<th class="number">Quantity (Pkgs. / Kgs)</th>')
-      .replace('<tfoot><tr><td colspan="4">Total Amount</td>', '<tfoot><tr><td colspan="4">Previous Dues</td><td class="number">₹ ' + Number(invoice.previousDues || 0).toFixed(2) + '</td></tr><tr><td colspan="4">Total Amount</td>')
-      .replace('<section class="summary"><div class="grand">Total Amount:', '<section class="summary"><div class="grand"><span class="dues">Previous Dues: ₹ ' + Number(invoice.previousDues || 0).toFixed(2) + '</span><strong>Total Amount:');
+      .replace('<tfoot><tr><td colspan="4">Total Amount</td><td class="number">₹ ' + Number(invoice.total || invoice.totals?.grand || 0).toFixed(2) + '</td></tr></tfoot>', '<tfoot><tr><td colspan="4">Total Amount</td><td class="number">₹ ' + itemTotal.toFixed(2) + '</td></tr><tr><td colspan="4">Previous Dues</td><td class="number">₹ ' + previousDues.toFixed(2) + '</td></tr><tr><td colspan="4">Grand Total</td><td class="number">₹ ' + grandTotal.toFixed(2) + '</td></tr></tfoot>')
+      .replace('<section class="summary"><div class="grand">Total Amount: ₹ ' + Number(invoice.total || invoice.totals?.grand || 0).toFixed(2) + '</div><div class="words">', '<section class="summary"><div class="grand"><span class="subtotal">Total Amount: ₹ ' + itemTotal.toFixed(2) + '</span><span class="dues">Previous Dues: ₹ ' + previousDues.toFixed(2) + '</span><strong>Grand Total: ₹ ' + grandTotal.toFixed(2) + '</strong></div><div class="words">');
     const stampPath = new URL('../Assets/stamp.png', window.location.href).href;
     printHtml = printHtml.replace('<section class="summary"><div class="grand"><span class="dues">', '<section class="summary"><img class="total-stamp" src="' + stampPath + '" alt="Authorised signatory stamp"><div class="grand"><span class="dues">')
-      .replace('<div class="signature"><span>SHANKAR SAH</span>', '<div class="signature"><img class="signature-stamp" src="' + stampPath + '" alt="Authorised signatory stamp"><span>Shankar Vegetable Shop</span>');
-    printHtml = printHtml.replace('</div><div class="words">', '</strong></div><div class="words">');
-    printHtml = printHtml.replace('</head>', '<style>.summary{position:relative}.total-stamp{position:absolute;left:8px;top:18px;width:108px;height:108px;object-fit:contain;z-index:2}.grand{position:relative;z-index:1}.signature{position:relative}.signature-stamp{display:block;width:108px;height:108px;object-fit:contain;margin:0 0 -20px auto;position:relative;z-index:1}</style></head>');
+      .replace('<div class="signature"><span>Shankar Vegetable Shop</span>', '<div class="signature"><img class="signature-stamp" src="' + stampPath + '" alt="Authorised signatory stamp"><span>Shankar Vegetable Shop</span><small class="authorized">Authorized Signatory</small>');
+    printHtml = printHtml.replace('</head>', '<style>.summary{position:relative}.total-stamp{position:absolute;left:8px;top:18px;width:108px;height:108px;object-fit:contain;z-index:2}.grand{position:relative;z-index:1}.grand .subtotal,.grand .dues{display:block;font-size:13px;font-weight:600;color:#657083;margin-bottom:5px}.grand strong{display:block;font-size:21px}.signature{position:relative;margin-top:48px}.signature-stamp{display:block;width:108px;height:108px;object-fit:contain;margin:0 0 -18px auto;position:relative;z-index:1}.signature span{position:relative;z-index:2;display:block;border-top:2px solid #172033;padding-top:7px}.authorized{display:block;margin-top:4px;color:#657083;font-size:11px;font-weight:600}</style></head>');
     win.document.write(printHtml.replace('src="./logo.png"', `src="${new URL('../Assets/logo.png', window.location.href).href}"`));
     win.document.close();
     setTimeout(() => { try { win.focus(); win.print(); } catch (error) { console.warn('Print failed', error); } }, 600);
   }
 
   function downloadInvoiceImage(invoice) {
+    const itemTotal = (invoice.items || []).reduce((sum, item) => sum + Number(item.price || 0), 0);
+    const previousDues = Number(invoice.previousDues || 0);
+    const grandTotal = itemTotal + previousDues;
     let html = buildPrintHTML(invoice)
       .replace('src="./logo.png"', `src="${new URL('../Assets/logo.png', window.location.href).href}"`)
       .replace('<main class="invoice">', '<main id="invoice-image" class="invoice">')
       .replace('<th class="number">Quantity</th>', '<th class="number">Quantity (Pkgs. / Kgs)</th>')
-      .replace('<tfoot><tr><td colspan="4">Total Amount</td>', '<tfoot><tr><td colspan="4">Previous Dues</td><td class="number">₹ ' + Number(invoice.previousDues || 0).toFixed(2) + '</td></tr><tr><td colspan="4">Total Amount</td>')
-      .replace('<section class="summary"><div class="grand">Total Amount:', '<section class="summary"><div class="grand"><span class="dues">Previous Dues: ₹ ' + Number(invoice.previousDues || 0).toFixed(2) + '</span><strong>Total Amount:');
+      .replace('<tfoot><tr><td colspan="4">Total Amount</td><td class="number">₹ ' + Number(invoice.total || invoice.totals?.grand || 0).toFixed(2) + '</td></tr></tfoot>', '<tfoot><tr><td colspan="4">Total Amount</td><td class="number">₹ ' + itemTotal.toFixed(2) + '</td></tr><tr><td colspan="4">Previous Dues</td><td class="number">₹ ' + previousDues.toFixed(2) + '</td></tr><tr><td colspan="4">Grand Total</td><td class="number">₹ ' + grandTotal.toFixed(2) + '</td></tr></tfoot>')
+      .replace('<section class="summary"><div class="grand">Total Amount: ₹ ' + Number(invoice.total || invoice.totals?.grand || 0).toFixed(2) + '</div><div class="words">', '<section class="summary"><div class="grand"><span class="subtotal">Total Amount: ₹ ' + itemTotal.toFixed(2) + '</span><span class="dues">Previous Dues: ₹ ' + previousDues.toFixed(2) + '</span><strong>Grand Total: ₹ ' + grandTotal.toFixed(2) + '</strong></div><div class="words">');
     const stampPath = new URL('../Assets/stamp.png', window.location.href).href;
     html = html.replace('<section class="summary"><div class="grand"><span class="dues">', '<section class="summary"><img class="total-stamp" src="' + stampPath + '" alt="Authorised signatory stamp"><div class="grand"><span class="dues">')
-      .replace('<div class="signature"><span>SHANKAR SAH</span>', '<div class="signature"><img class="signature-stamp" src="' + stampPath + '" alt="Authorised signatory stamp"><span>Shankar Vegetable Shop</span>');
-    html = html.replace('</div><div class="words">', '</strong></div><div class="words">');
-    html = html.replace(/SHANKAR SAH/g, 'Shankar Vegetable Shop').replace('</head>', '<style>html,body{margin:0;background:#fff!important}#invoice-page{width:794px;min-height:1123px;padding:45px;box-sizing:border-box;background:#fff}.invoice{width:100%!important;max-width:none!important;margin:0!important}.summary,.items{break-inside:avoid}.summary{position:relative}.total-stamp{position:absolute;left:8px;top:18px;width:108px;height:108px;object-fit:contain;z-index:2}.grand{position:relative;z-index:1}.signature{position:relative}.signature-stamp{display:block;width:108px;height:108px;object-fit:contain;margin:0 0 -20px auto;position:relative;z-index:1}</style></head>');
+      .replace('<div class="signature"><span>Shankar Vegetable Shop</span>', '<div class="signature"><img class="signature-stamp" src="' + stampPath + '" alt="Authorised signatory stamp"><span>Shankar Vegetable Shop</span><small class="authorized">Authorized Signatory</small>');
+    html = html.replace(/SHANKAR SAH/g, 'Shankar Vegetable Shop').replace('</head>', '<style>html,body{margin:0;background:#fff!important}#invoice-page{width:794px;min-height:1123px;padding:45px;box-sizing:border-box;background:#fff}.invoice{width:100%!important;max-width:none!important;margin:0!important}.summary,.items{break-inside:avoid}.summary{position:relative}.total-stamp{position:absolute;left:8px;top:18px;width:108px;height:108px;object-fit:contain;z-index:2}.grand{position:relative;z-index:1}.grand .subtotal,.grand .dues{display:block;font-size:13px;font-weight:600;color:#657083;margin-bottom:5px}.grand strong{display:block;font-size:21px}.signature{position:relative;margin-top:48px}.signature-stamp{display:block;width:108px;height:108px;object-fit:contain;margin:0 0 -18px auto;position:relative;z-index:1}.signature span{position:relative;z-index:2;display:block;border-top:2px solid #172033;padding-top:7px}.authorized{display:block;margin-top:4px;color:#657083;font-size:11px;font-weight:600}</style></head>');
     const win = window.open('', '_blank');
     if (!win) return alert('Please allow pop-ups to save the invoice image.');
     const fileName = `${String(invoice.invoiceId || invoice.invoiceNumber || 'invoice').replace(/[^a-z0-9_-]+/gi, '-')}.png`;

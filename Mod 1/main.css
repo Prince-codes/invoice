@@ -61,20 +61,6 @@ body {
   align-items: center;
 }
 
-.logo-glow {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, rgba(106,0,255,0.95), rgba(0,229,255,0.85));
-  box-shadow: 0 6px 18px rgba(0,0,0,0.35), 0 0 20px rgba(161,0,255,0.12);
-  overflow: hidden;
-  padding: 6px;
-  border: 1px solid rgba(255,255,255,0.06);
-}
-
 .brand-logo {
   width: 76px;
   height: 76px;
@@ -395,10 +381,6 @@ input:focus, select:focus {
     justify-content: flex-end;
     flex-wrap: wrap;
   }
-  .logo-glow {
-    width: 56px;
-    height: 56px;
-  }
   .brand-left > div {
     display: flex;
     flex-direction: column;
@@ -408,7 +390,6 @@ input:focus, select:focus {
 @media (max-width: 480px) {
   .app-shell { padding: 12px; }
   .modal-content { padding: 14px; }
-  .logo-glow { width: 48px; height: 48px; }
   .brand h1 { font-size: 1.1rem; }
   .daily-table { min-width: 100%; }
   #previousBillsTable { width: 100%; }

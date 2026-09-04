@@ -29,8 +29,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const updateBtn = document.getElementById('updateBtn');
   const printEditedBtn = document.getElementById('printEditedBtn');
   const exportCsvBtn = document.getElementById('exportCsvBtn');
-  const importCsvBtn = document.getElementById('importCsvBtn');
-  const importCsvInput = document.getElementById('importCsv');
 
   let editingInvoiceId = null;
   let saveInProgress = false;
@@ -447,60 +445,6 @@ document.addEventListener('DOMContentLoaded', () => {
     return `${y}-${m}-${dd}`;
   }
 
-  function parseInvoicesCsv(text) {
-    const lines = text.split(/\r?\n/).filter(Boolean);
-    if (lines.length < 2) return [];
-    const res = [];
-
-    for (let i = 1; i < lines.length; i++) {
-      const line = lines[i];
-      const parts = [];
-      let cur = '';
-      let inQuotes = false;
-      for (const ch of line) {
-        if (ch === '"') {
-          inQuotes = !inQuotes;
-          cur += ch;
-        } else if (ch === ',' && !inQuotes) {
-          parts.push(cur);
-          cur = '';
-        } else {
-          cur += ch;
-        }
-      }
-      if (cur !== '') parts.push(cur);
-      while (parts.length < 9) parts.push('');
-
-      const invoiceId = Number(parts[0]) || undefined;
-      const customerName = (parts[1] || '').replace(/""/g, '"').replace(/^"|"$/g, '');
-      const monthYearISO = parts[2] || '';
-      const monthText = (parts[3] || '').replace(/""/g, '"').replace(/^"|"$/g, '');
-      const total = parts[4] || '';
-      const totalWords = (parts[5] || '').replace(/""/g, '"').replace(/^"|"$/g, '');
-      const createdAt = parts[6] || '';
-      const createdBy = (parts[7] || '').replace(/""/g, '"').replace(/^"|"$/g, '');
-      let dailyJson = parts.slice(8).join(',') || '';
-      dailyJson = dailyJson.replace(/^"|"$/g, '').replace(/""/g, '"');
-
-      let daily = [];
-      try { daily = JSON.parse(dailyJson); } catch (e) { daily = []; }
-
-      res.push({
-        invoiceId,
-        customerName,
-        monthYearISO,
-        monthText,
-        totals: { grand: Number(total || 0) },
-        totalWords,
-        createdAt,
-        createdBy,
-        daily
-      });
-    }
-
-    return res;
-  }
-
   if (viewPreviousBtn) {
     viewPreviousBtn.addEventListener('click', () => {
       let invoices = loadInvoicesFromStorage();
@@ -565,37 +509,6 @@ document.addEventListener('DOMContentLoaded', () => {
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
-    });
-  }
-
-  if (importCsvBtn && importCsvInput) {
-    importCsvBtn.addEventListener('click', () => importCsvInput.click());
-    importCsvInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function (evt) {
-        const text = evt.target.result;
-        try {
-          const parsed = parseInvoicesCsv(text);
-          if (parsed.length === 0) { alert('No invoices found in CSV.'); return; }
-          const existing = loadInvoicesFromStorage();
-          const existingIds = new Set(existing.map(i => i.invoiceId));
-          parsed.forEach(p => {
-            if (!existingIds.has(p.invoiceId)) existing.push(p);
-          });
-          localStorage.setItem('invoices', JSON.stringify(existing));
-          const maxId = existing.reduce((mx, it) => Math.max(mx, Number(it.invoiceId || 0)), 0);
-          localStorage.setItem('nextInvoiceId', String(maxId + 1));
-          updateCsvCache();
-          alert('Imported invoices. You can now view previous bills.');
-        } catch (err) {
-          console.error(err);
-          alert('Failed to parse CSV.');
-        }
-      };
-      reader.readAsText(file);
-      importCsvInput.value = '';
     });
   }
 
