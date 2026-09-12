@@ -30,14 +30,11 @@ body {
 
 /* App Shell */
 .app-shell {
-  max-width: 1100px;
-  margin: 0 auto;
   background: var(--glass);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   backdrop-filter: blur(var(--blur));
   border: 1.5px solid rgba(161,0,255,0.18);
-  padding: 18px;
 }
 
 /* Header */
@@ -46,8 +43,6 @@ body {
   justify-content: space-between;
   align-items: center;
   gap: 16px;
-  margin-bottom: 20px;
-  padding: 16px;
   border-radius: 18px;
   background: linear-gradient(135deg, rgba(106,0,255,0.12), rgba(0,229,255,0.08));
   border: 1.5px solid rgba(161,0,255,0.18);
@@ -86,8 +81,6 @@ body {
 
 /* Card */
 .card {
-  margin-top: 16px;
-  padding: 20px;
   border-radius: 18px;
   background: linear-gradient(135deg, rgba(106,0,255,0.12), rgba(0,229,255,0.08));
   border: 1.5px solid rgba(161,0,255,0.18);
@@ -102,8 +95,6 @@ h2 {
 /* Form */
 .form-grid {
   display: grid;
-  grid-template-columns: 1fr 220px;
-  gap: 14px;
   align-items: end;
 }
 
@@ -204,13 +195,9 @@ input:focus, select:focus {
 }
 
 .modal-content {
-  width: 1000px;
-  max-width: 100%;
   background: linear-gradient(135deg,#1a0033 80%, #6A00FF 100%);
   border-radius: var(--radius);
-  padding: 18px 40px;
   border: 1.5px solid rgba(161,0,255,0.18);
-  max-height: 80vh;
   overflow-y: auto;
   box-shadow: var(--shadow);
   color: #fff;
@@ -299,10 +286,7 @@ input:focus, select:focus {
 
 .item-row {
   display: grid;
-  grid-template-columns: 42px minmax(160px, 1.8fr) minmax(150px, 1.1fr) minmax(120px, 1fr) minmax(120px, 1fr) 72px;
-  gap: 8px;
   align-items: center;
-  padding: 8px;
   border: 1px solid rgba(161,0,255,0.18);
   border-radius: 12px;
   background: rgba(106,0,255,0.06);
@@ -310,8 +294,6 @@ input:focus, select:focus {
 
 .item-header {
   display: grid;
-  grid-template-columns: 42px minmax(160px, 1.8fr) minmax(150px, 1.1fr) minmax(120px, 1fr) minmax(120px, 1fr) 72px;
-  gap: 8px;
   padding: 0 8px 5px;
   color: var(--muted);
   font-size: 11px;
@@ -337,13 +319,30 @@ input:focus, select:focus {
   flex: 0 0 72px;
   width: 72px;
   min-width: 72px;
-  padding: 10px 10px;
-  border-radius: 10px;
+  appearance: none;
+  padding: 13px 16px;
+  border-radius: 12px;
   background: rgba(255,255,255,0.1);
   border: none;
   color: #fff;
-  font-size: 0.9rem;
+  font-size: 1.08rem;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(161,0,255,0.08);
 }
+
+.item-quantity-wrap .item-unit:hover,
+.item-quantity-wrap .item-unit:focus {
+  background: rgba(161,0,255,0.12);
+  color: #fff;
+  box-shadow: 0 0 8px #A100FF;
+}
+
+.item-quantity-wrap .item-unit option {
+  background: #1a0033;
+  color: #fff;
+}
+
 
 .item-number {
   text-align: center;
@@ -386,8 +385,6 @@ input:focus, select:focus {
   display: flex;
   gap: 16px;
   justify-content: space-between;
-  margin-top: 12px;
-  padding: 8px;
   color: var(--muted);
 }
 
@@ -409,65 +406,6 @@ input:focus, select:focus {
   color: var(--muted);
   font-size: 15px;
   letter-spacing: 1px;
-}
-
-/* Responsive */
-@media (max-width: 860px) {
-  .form-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-  .item-row {
-    grid-template-columns: 34px minmax(0, 1.2fr) minmax(0, 1fr);
-  }
-  .item-header {
-    display: none;
-  }
-  .item-row .item-name {
-    grid-column: 2 / 4;
-  }
-  .item-row .item-quantity-wrap {
-    grid-column: 2 / 4;
-    width: 100%;
-  }
-  .item-row .item-quote {
-    grid-column: 2;
-  }
-  .item-row .item-price {
-    grid-column: 3;
-  }
-  .item-row .remove-item {
-    grid-column: 3;
-    justify-self: end;
-  }
-  .actions {
-    justify-content: center;
-  }
-  .brand {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
-  .brand-right {
-    width: 100%;
-    display: flex;
-    gap: 8px;
-    justify-content: flex-end;
-    flex-wrap: wrap;
-  }
-  .brand-left > div {
-    display: flex;
-    flex-direction: column;
-  }
-}
-
-@media (max-width: 480px) {
-  .app-shell { padding: 12px; }
-  .modal-content { padding: 14px; }
-  .brand h1 { font-size: 1.1rem; }
-  #previousBillsTable { width: 100%; }
-  .actions { gap: 8px; flex-direction: column; }
-  .btn { width: 100%; }
 }
 
 /* Final layout constraints for the date-bill editor */
@@ -564,7 +502,7 @@ input:focus, select:focus {
 
 .item-header,
 .item-row {
-  grid-template-columns: 48px minmax(180px, 1.8fr) minmax(110px, .8fr) minmax(130px, 1fr) minmax(130px, 1fr) 72px;
+  grid-template-columns: 48px minmax(180px, 1.8fr) minmax(170px, 1.1fr) minmax(130px, 1fr) minmax(130px, 1fr) 72px;
   gap: 10px;
 }
 
@@ -592,10 +530,27 @@ input:focus, select:focus {
 
   .form-grid {
     grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .actions {
+    justify-content: center;
+  }
+
+  .brand {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
   }
 
   .brand-right {
+    width: 100%;
     justify-content: flex-start;
+  }
+
+  .brand-left > div {
+    display: flex;
+    flex-direction: column;
   }
 
   .item-header {
@@ -660,6 +615,19 @@ input:focus, select:focus {
     min-width: 0;
     padding: 11px 8px;
     font-size: .78rem;
+  }
+
+  #previousBillsTable {
+    width: 100%;
+  }
+
+  .actions {
+    gap: 8px;
+    flex-direction: column;
+  }
+
+  .actions .btn {
+    width: 100%;
   }
 
   .modal {
