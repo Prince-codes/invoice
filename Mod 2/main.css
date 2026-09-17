@@ -388,6 +388,47 @@ input:focus, select:focus {
   color: var(--muted);
 }
 
+.transport-option {
+  margin-top: 14px;
+  padding: 12px;
+  gap: 8px;
+  border: 1px solid rgba(161,0,255,0.18);
+  border-radius: 12px;
+  background: rgba(106,0,255,0.06);
+  color: var(--muted);
+}
+
+.transport-option > span:first-child {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.transport-option input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+#transportationChargeField {
+  display: flex;
+  flex-direction: column;
+  width: min(260px, 100%);
+  gap: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .02em;
+}
+
+#transportationChargeField input {
+  width: 100%;
+}
+
 .dues-field {
   min-width: 180px;
 }

@@ -598,22 +598,32 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // CSV export (downloads invoices_csv)
+  // Excel export with one worksheet per invoice
   if (exportCsvBtn) {
     exportCsvBtn.addEventListener('click', () => {
-    updateCsvCache();
-    const csv = localStorage.getItem('invoices_csv') || '';
-    if (!csv) return alert('No invoices to export.');
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'invoices_export.csv';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
+    const invoices = loadInvoicesFromStorage();
+    if (!invoices.length) return alert('No invoices to export.');
+    downloadExcelWorkbook(invoices);
     });
+  }
+
+  function downloadExcelWorkbook(invoices) {
+    window.downloadInvoiceWorkbook(invoices.map((invoice, index) => ({
+      name: `Bill ${invoice.invoiceId || index + 1}`,
+      rows: [
+        ['Invoice Summary', ''],
+        ['Invoice ID', invoice.invoiceId || ''],
+        ['Customer Name', invoice.customerName || ''],
+        ['Billing Month', invoice.monthText || invoice.monthYearISO || ''],
+        ['Total 1', Number(invoice.totals?.t1 || 0)],
+        ['Total 2', Number(invoice.totals?.t2 || 0)],
+        ['Grand Total', Number(invoice.totals?.grand || invoice.total || 0)],
+        ['Amount in Words', invoice.totalWords || ''],
+        [],
+        ['Day', 'Date', 'Amount'],
+        ...(invoice.daily || []).map(entry => [entry.day_num || '', entry.date || '', entry.is_empty ? '' : Number(entry.amount || 0)])
+      ]
+    })));
   }
 
   // CSV import: user chooses a CSV; we parse and merge into storage

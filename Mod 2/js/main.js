@@ -5,9 +5,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const billingDateInput = document.getElementById('billingDate');
   const openBtn = document.getElementById('openBtn');
   const modal = document.getElementById('modal');
+  const editorCustomerInput = document.getElementById('editorCustomer');
   const tablesContainer = document.getElementById('tablesContainer');
   const amountWords = document.getElementById('amountWords');
   const previousDuesInput = document.getElementById('previousDues');
+  const transportationChargedInput = document.getElementById('transportationCharged');
+  const transportationChargeField = document.getElementById('transportationChargeField');
+  const transportationChargeInput = document.getElementById('transportationCharge');
   const totalAllEl = document.getElementById('totalAll');
   const saveBtn = document.getElementById('saveBtn');
   const saveImageBtn = document.getElementById('saveImageBtn');
@@ -53,6 +57,9 @@ document.addEventListener('DOMContentLoaded', () => {
     tablesContainer.innerHTML = '';
     amountWords.value = '';
     previousDuesInput.value = '';
+    transportationChargedInput.checked = false;
+    transportationChargeInput.value = '';
+    transportationChargeField.classList.add('is-hidden');
     editingInvoiceId = null;
     saveInProgress = false;
     setEditorButtonMode(false);
@@ -60,6 +67,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function openNewEditor() {
     editingInvoiceId = null;
+    editorCustomerInput.value = customerInput.value.trim();
+    transportationChargedInput.checked = false;
+    transportationChargeInput.value = '';
+    transportationChargeField.classList.add('is-hidden');
     tablesContainer.innerHTML = '';
     addItemRow();
     setEditorButtonMode(false);
@@ -68,6 +79,12 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   previousDuesInput.addEventListener('input', recalcTotal);
+  transportationChargedInput.addEventListener('change', () => {
+    transportationChargeField.classList.toggle('is-hidden', !transportationChargedInput.checked);
+    if (!transportationChargedInput.checked) transportationChargeInput.value = '';
+    recalcTotal();
+  });
+  transportationChargeInput.addEventListener('input', recalcTotal);
 
   function addItemRow(item = {}) {
     const row = document.createElement('div');
@@ -120,6 +137,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     const previousDues = Number(previousDuesInput.value);
     total += Number.isFinite(previousDues) && previousDues >= 0 ? previousDues : 0;
+    const transportationCharge = transportationChargedInput.checked ? Number(transportationChargeInput.value) : 0;
+    total += Number.isFinite(transportationCharge) && transportationCharge >= 0 ? transportationCharge : 0;
     totalAllEl.textContent = total.toFixed(2);
     amountWords.value = numberToWords(Math.round(total));
   }
@@ -150,9 +169,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!items) return null;
 
     const previousDues = Number(previousDuesInput.value || 0);
+    const transportationCharged = transportationChargedInput.checked;
+    const transportationCharge = transportationCharged ? Number(transportationChargeInput.value || 0) : 0;
+    if (!Number.isFinite(transportationCharge) || transportationCharge < 0) {
+      alert('Enter a valid non-negative transportation charge.');
+      return null;
+    }
     const itemTotal = items.reduce((sum, item) => sum + item.price, 0);
-    const total = itemTotal + (Number.isFinite(previousDues) && previousDues >= 0 ? previousDues : 0);
-    const customerName = customerInput.value.trim();
+    const total = itemTotal + (Number.isFinite(previousDues) && previousDues >= 0 ? previousDues : 0) + transportationCharge;
+    const customerName = editorCustomerInput.value.trim();
+    if (!customerName) {
+      alert('Enter customer name first.');
+      return null;
+    }
     const invoiceNumber = getNextInvoiceId();
 
     return {
@@ -163,6 +192,8 @@ document.addEventListener('DOMContentLoaded', () => {
       dateText: formatDate(billingDateInput.value),
       items,
       previousDues: Number(previousDues.toFixed(2)),
+      transportationCharged,
+      transportationCharge: Number(transportationCharge.toFixed(2)),
       total: Number(total.toFixed(2)),
       totals: { grand: Number(total.toFixed(2)) },
       totalWords: amountWords.value || numberToWords(Math.round(total)),
@@ -209,7 +240,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function updateCsvCache() {
-    const header = ['invoiceId', 'invoiceNumber', 'customerName', 'billingDate', 'dateText', 'previousDues', 'total', 'totalWords', 'createdAt', 'createdBy', 'items_json'];
+    const header = ['invoiceId', 'invoiceNumber', 'customerName', 'billingDate', 'dateText', 'previousDues', 'transportationCharged', 'transportationCharge', 'total', 'totalWords', 'createdAt', 'createdBy', 'items_json'];
     const rows = loadInvoices().map(invoice => [
       invoice.invoiceId,
       csvValue(invoice.invoiceNumber || invoice.invoiceId || ''),
@@ -217,6 +248,8 @@ document.addEventListener('DOMContentLoaded', () => {
       invoice.billingDate || '',
       csvValue(invoice.dateText || ''),
       Number(invoice.previousDues || 0),
+      invoice.transportationCharged === true,
+      Number(invoice.transportationCharge || 0),
       invoice.total || 0,
       csvValue(invoice.totalWords || ''),
       invoice.createdAt || '',
@@ -246,8 +279,12 @@ document.addEventListener('DOMContentLoaded', () => {
   function openInvoiceInEditor(invoice) {
     editingInvoiceId = invoice.invoiceId;
     customerInput.value = invoice.customerName || '';
+    editorCustomerInput.value = invoice.customerName || '';
     billingDateInput.value = invoice.billingDate || (invoice.monthYearISO ? invoice.monthYearISO.slice(0, 10) : '');
     previousDuesInput.value = invoice.previousDues ?? '';
+    transportationChargedInput.checked = invoice.transportationCharged === true || Number(invoice.transportationCharge || 0) > 0;
+    transportationChargeInput.value = invoice.transportationCharge ?? '';
+    transportationChargeField.classList.toggle('is-hidden', !transportationChargedInput.checked);
     tablesContainer.innerHTML = '';
     (invoice.items || []).forEach(item => addItemRow(item));
     if (!tablesContainer.children.length) addItemRow();
@@ -264,17 +301,22 @@ document.addEventListener('DOMContentLoaded', () => {
     win.document.open();
     const itemTotal = (invoice.items || []).reduce((sum, item) => sum + Number(item.price || 0), 0);
     const previousDues = Number(invoice.previousDues || 0);
-    const grandTotal = itemTotal + previousDues;
+    const transportationCharge = Number(invoice.transportationCharge || 0);
+    const grandTotal = itemTotal + previousDues + transportationCharge;
+    const transportationRow = invoice.transportationCharged === true || transportationCharge > 0
+      ? '<tr><td colspan="4">Transportation Charge</td><td class="number">₹ ' + transportationCharge.toFixed(2) + '</td></tr>'
+      : '';
     let printHtml = buildPrintHTML(invoice)
       .replace('<th class="number">Quantity</th>', '<th class="number">Quantity (Pkgs. / Kgs)</th>')
-      .replace('<tfoot><tr><td colspan="4">Total Amount</td><td class="number">₹ ' + Number(invoice.total || invoice.totals?.grand || 0).toFixed(2) + '</td></tr></tfoot>', '<tfoot><tr><td colspan="4">Total Amount</td><td class="number">₹ ' + itemTotal.toFixed(2) + '</td></tr><tr><td colspan="4">Previous Dues</td><td class="number">₹ ' + previousDues.toFixed(2) + '</td></tr><tr><td colspan="4">Grand Total</td><td class="number">₹ ' + grandTotal.toFixed(2) + '</td></tr></tfoot>')
-      .replace('<section class="summary"><div class="grand">Total Amount: ₹ ' + Number(invoice.total || invoice.totals?.grand || 0).toFixed(2) + '</div><div class="words">', '<section class="summary"><div class="grand"><span class="subtotal">Total Amount: ₹ ' + itemTotal.toFixed(2) + '</span><span class="dues">Previous Dues: ₹ ' + previousDues.toFixed(2) + '</span><strong>Grand Total: ₹ ' + grandTotal.toFixed(2) + '</strong></div><div class="words">');
+      .replace('<tfoot><tr><td colspan="4">Total Amount</td><td class="number">₹ ' + Number(invoice.total || invoice.totals?.grand || 0).toFixed(2) + '</td></tr></tfoot>', '<tfoot><tr><td colspan="4">Total Amount</td><td class="number">₹ ' + itemTotal.toFixed(2) + '</td></tr><tr><td colspan="4">Previous Dues</td><td class="number">₹ ' + previousDues.toFixed(2) + '</td></tr>' + transportationRow + '<tr><td colspan="4">Grand Total</td><td class="number">₹ ' + grandTotal.toFixed(2) + '</td></tr></tfoot>')
+      .replace('<section class="summary"><div class="grand">Total Amount: ₹ ' + Number(invoice.total || invoice.totals?.grand || 0).toFixed(2) + '</div><div class="words">', '<section class="summary"><div class="grand"><span class="subtotal">Total Amount: ₹ ' + itemTotal.toFixed(2) + '</span><span class="dues">Previous Dues: ₹ ' + previousDues.toFixed(2) + '</span>' + (transportationRow ? '<span class="transportation">Transportation Charge: ₹ ' + transportationCharge.toFixed(2) + '</span>' : '') + '<strong>Grand Total: ₹ ' + grandTotal.toFixed(2) + '</strong></div><div class="words">');
     const printTitle = escapeHtml(invoice.customerName || `Invoice ${invoice.invoiceId || invoice.invoiceNumber || ''}`);
-    printHtml = printHtml.replace(/<title>.*?<\/title>/, `<title>Invoice - ${printTitle}</title>`);
+    const billDate = escapeHtml(invoice.billingDate || 'undated');
+    printHtml = printHtml.replace(/<title>.*?<\/title>/, `<title>Invoice - ${printTitle} - ${billDate}</title>`);
     const stampPath = new URL('../Assets/stamp.png', window.location.href).href;
     printHtml = printHtml.replace('<section class="summary"><div class="grand"><span class="dues">', '<section class="summary"><img class="total-stamp" src="' + stampPath + '" alt="Authorised signatory stamp"><div class="grand"><span class="dues">')
       .replace('<div class="signature"><span>Shankar Vegetable Shop</span>', '<div class="signature"><img class="signature-stamp" src="' + stampPath + '" alt="Authorised signatory stamp"><span>Shankar Vegetable Shop</span><small class="authorized">Authorized Signatory</small>');
-    printHtml = printHtml.replace('</head>', '<style>.summary{position:relative}.total-stamp{position:absolute;left:8px;top:18px;width:108px;height:108px;object-fit:contain;z-index:2}.grand{position:relative;z-index:1}.grand .subtotal,.grand .dues{display:block;font-size:13px;font-weight:600;color:#657083;margin-bottom:5px}.grand strong{display:block;font-size:21px}.signature{position:relative;margin-top:48px}.signature-stamp{display:block;width:108px;height:108px;object-fit:contain;margin:0 0 -18px auto;position:relative;z-index:1}.signature span{position:relative;z-index:2;display:block;border-top:2px solid #172033;padding-top:7px}.authorized{display:block;margin-top:4px;color:#657083;font-size:11px;font-weight:600}</style></head>');
+    printHtml = printHtml.replace('</head>', '<style>.summary{position:relative}.total-stamp{position:absolute;left:8px;top:18px;width:108px;height:108px;object-fit:contain;z-index:2}.grand{position:relative;z-index:1}.grand .subtotal,.grand .dues,.grand .transportation{display:block;font-size:13px;font-weight:600;color:#657083;margin-bottom:5px}.grand strong{display:block;font-size:21px}.signature{position:relative;margin-top:48px}.signature-stamp{display:block;width:108px;height:108px;object-fit:contain;margin:0 0 -18px auto;position:relative;z-index:1}.signature span{position:relative;z-index:2;display:block;border-top:2px solid #172033;padding-top:7px}.authorized{display:block;margin-top:4px;color:#657083;font-size:11px;font-weight:600}</style></head>');
     win.document.write(printHtml.replace('src="./logo.png"', `src="${new URL('../Assets/logo.png', window.location.href).href}"`));
     win.document.close();
     setTimeout(() => { try { win.focus(); win.print(); } catch (error) { console.warn('Print failed', error); } }, 600);
@@ -283,21 +325,26 @@ document.addEventListener('DOMContentLoaded', () => {
   function downloadInvoiceImage(invoice) {
     const itemTotal = (invoice.items || []).reduce((sum, item) => sum + Number(item.price || 0), 0);
     const previousDues = Number(invoice.previousDues || 0);
-    const grandTotal = itemTotal + previousDues;
+    const transportationCharge = Number(invoice.transportationCharge || 0);
+    const grandTotal = itemTotal + previousDues + transportationCharge;
+    const transportationRow = invoice.transportationCharged === true || transportationCharge > 0
+      ? '<tr><td colspan="4">Transportation Charge</td><td class="number">₹ ' + transportationCharge.toFixed(2) + '</td></tr>'
+      : '';
     let html = buildPrintHTML(invoice)
       .replace('src="./logo.png"', `src="${new URL('../Assets/logo.png', window.location.href).href}"`)
       .replace('<main class="invoice">', '<main id="invoice-image" class="invoice">')
       .replace('<th class="number">Quantity</th>', '<th class="number">Quantity (Pkgs. / Kgs)</th>')
-      .replace('<tfoot><tr><td colspan="4">Total Amount</td><td class="number">₹ ' + Number(invoice.total || invoice.totals?.grand || 0).toFixed(2) + '</td></tr></tfoot>', '<tfoot><tr><td colspan="4">Total Amount</td><td class="number">₹ ' + itemTotal.toFixed(2) + '</td></tr><tr><td colspan="4">Previous Dues</td><td class="number">₹ ' + previousDues.toFixed(2) + '</td></tr><tr><td colspan="4">Grand Total</td><td class="number">₹ ' + grandTotal.toFixed(2) + '</td></tr></tfoot>')
-      .replace('<section class="summary"><div class="grand">Total Amount: ₹ ' + Number(invoice.total || invoice.totals?.grand || 0).toFixed(2) + '</div><div class="words">', '<section class="summary"><div class="grand"><span class="subtotal">Total Amount: ₹ ' + itemTotal.toFixed(2) + '</span><span class="dues">Previous Dues: ₹ ' + previousDues.toFixed(2) + '</span><strong>Grand Total: ₹ ' + grandTotal.toFixed(2) + '</strong></div><div class="words">');
+      .replace('<tfoot><tr><td colspan="4">Total Amount</td><td class="number">₹ ' + Number(invoice.total || invoice.totals?.grand || 0).toFixed(2) + '</td></tr></tfoot>', '<tfoot><tr><td colspan="4">Total Amount</td><td class="number">₹ ' + itemTotal.toFixed(2) + '</td></tr><tr><td colspan="4">Previous Dues</td><td class="number">₹ ' + previousDues.toFixed(2) + '</td></tr>' + transportationRow + '<tr><td colspan="4">Grand Total</td><td class="number">₹ ' + grandTotal.toFixed(2) + '</td></tr></tfoot>')
+      .replace('<section class="summary"><div class="grand">Total Amount: ₹ ' + Number(invoice.total || invoice.totals?.grand || 0).toFixed(2) + '</div><div class="words">', '<section class="summary"><div class="grand"><span class="subtotal">Total Amount: ₹ ' + itemTotal.toFixed(2) + '</span><span class="dues">Previous Dues: ₹ ' + previousDues.toFixed(2) + '</span>' + (transportationRow ? '<span class="transportation">Transportation Charge: ₹ ' + transportationCharge.toFixed(2) + '</span>' : '') + '<strong>Grand Total: ₹ ' + grandTotal.toFixed(2) + '</strong></div><div class="words">');
     const stampPath = new URL('../Assets/stamp.png', window.location.href).href;
     html = html.replace('<section class="summary"><div class="grand"><span class="dues">', '<section class="summary"><img class="total-stamp" src="' + stampPath + '" alt="Authorised signatory stamp"><div class="grand"><span class="dues">')
       .replace('<div class="signature"><span>Shankar Vegetable Shop</span>', '<div class="signature"><img class="signature-stamp" src="' + stampPath + '" alt="Authorised signatory stamp"><span>Shankar Vegetable Shop</span><small class="authorized">Authorized Signatory</small>');
-    html = html.replace(/SHANKAR SAH/g, 'Shankar Vegetable Shop').replace('</head>', '<style>html,body{margin:0;background:#fff!important}#invoice-page{width:794px;min-height:1123px;padding:45px;box-sizing:border-box;background:#fff}.invoice{width:100%!important;max-width:none!important;margin:0!important}.summary,.items{break-inside:avoid}.summary{position:relative}.total-stamp{position:absolute;left:8px;top:18px;width:108px;height:108px;object-fit:contain;z-index:2}.grand{position:relative;z-index:1}.grand .subtotal,.grand .dues{display:block;font-size:13px;font-weight:600;color:#657083;margin-bottom:5px}.grand strong{display:block;font-size:21px}.signature{position:relative;margin-top:48px}.signature-stamp{display:block;width:108px;height:108px;object-fit:contain;margin:0 0 -18px auto;position:relative;z-index:1}.signature span{position:relative;z-index:2;display:block;border-top:2px solid #172033;padding-top:7px}.authorized{display:block;margin-top:4px;color:#657083;font-size:11px;font-weight:600}</style></head>');
+    html = html.replace(/SHANKAR SAH/g, 'Shankar Vegetable Shop').replace('</head>', '<style>html,body{margin:0;background:#fff!important}#invoice-page{width:794px;min-height:1123px;padding:45px;box-sizing:border-box;background:#fff}.invoice{width:100%!important;max-width:none!important;margin:0!important}.summary,.items{break-inside:avoid}.summary{position:relative}.total-stamp{position:absolute;left:8px;top:18px;width:108px;height:108px;object-fit:contain;z-index:2}.grand{position:relative;z-index:1}.grand .subtotal,.grand .dues,.grand .transportation{display:block;font-size:13px;font-weight:600;color:#657083;margin-bottom:5px}.grand strong{display:block;font-size:21px}.signature{position:relative;margin-top:48px}.signature-stamp{display:block;width:108px;height:108px;object-fit:contain;margin:0 0 -18px auto;position:relative;z-index:1}.signature span{position:relative;z-index:2;display:block;border-top:2px solid #172033;padding-top:7px}.authorized{display:block;margin-top:4px;color:#657083;font-size:11px;font-weight:600}</style></head>');
     const win = window.open('', '_blank');
     if (!win) return alert('Please allow pop-ups to save the invoice image.');
     const customerFileName = String(invoice.customerName || '').trim().replace(/[^a-z0-9_-]+/gi, '-');
-    const fileName = `${customerFileName || invoice.invoiceId || invoice.invoiceNumber || 'invoice'}.png`;
+    const billDate = String(invoice.billingDate || 'undated').replace(/[^a-z0-9_-]+/gi, '-');
+    const fileName = `${customerFileName || invoice.invoiceId || invoice.invoiceNumber || 'invoice'}-${billDate}.png`;
     win.document.open();
     win.document.write(html.replace('</body>', `<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"><\/script><script>window.addEventListener('load', async function () { try { if (typeof html2canvas !== 'function') throw new Error('Image renderer could not be loaded.'); const invoice = document.getElementById('invoice-image'); const page = document.createElement('div'); page.id = 'invoice-page'; invoice.parentNode.insertBefore(page, invoice); page.appendChild(invoice); if (document.fonts) await document.fonts.ready; const canvas = await html2canvas(page, { scale: 2, useCORS: true, backgroundColor: '#ffffff', width: 794, height: 1123 }); const link = document.createElement('a'); link.download = ${JSON.stringify(fileName)}; link.href = canvas.toDataURL('image/png'); document.body.appendChild(link); link.click(); setTimeout(function () { window.close(); }, 500); } catch (error) { document.body.insertAdjacentHTML('afterbegin', '<p>Unable to create invoice image. Check your internet connection and try again.</p>'); } });<\/script></body>`));
     win.document.close();
@@ -312,14 +359,32 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   document.getElementById('exportCsvBtn').addEventListener('click', () => {
-    updateCsvCache();
-    const blob = new Blob([localStorage.getItem('invoices_csv') || ''], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'invoices_export.csv';
-    link.click();
-    URL.revokeObjectURL(link.href);
+    const invoices = loadInvoices();
+    if (!invoices.length) return alert('No invoices to export.');
+    downloadExcelWorkbook(invoices);
   });
+
+  function downloadExcelWorkbook(invoices) {
+    window.downloadInvoiceWorkbook(invoices.map((invoice, index) => {
+      const itemRows = [['S.No.', 'Item', 'Quantity', 'Unit', 'Rate', 'Price']];
+      (invoice.items || []).forEach((item, itemIndex) => itemRows.push([item.sNo || itemIndex + 1, item.name || '', Number(item.quantity || 0), item.unit || '', Number(item.quotePrice || 0), Number(item.price || 0)]));
+      const rows = [
+        ['Invoice Summary', ''],
+        ['Invoice ID', invoice.invoiceId || ''],
+        ['Customer Name', invoice.customerName || ''],
+        ['Bill of Date', invoice.dateText || invoice.billingDate || ''],
+        ['Items Total', itemRows.slice(1).reduce((sum, item) => sum + item[5], 0)],
+        ['Previous Dues', Number(invoice.previousDues || 0)],
+        ['Transportation Charged', invoice.transportationCharged === true ? 'Yes' : 'No'],
+        ['Transportation Charge', Number(invoice.transportationCharge || 0)],
+        ['Grand Total', Number(invoice.total || invoice.totals?.grand || 0)],
+        ['Amount in Words', invoice.totalWords || ''],
+        [],
+        ...itemRows
+      ];
+      return { name: `Bill ${invoice.invoiceId || index + 1}`, rows };
+    }));
+  }
 
   function formatDate(value) {
     return value ? new Date(`${value}T00:00:00`).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '';
