@@ -89,10 +89,15 @@ document.addEventListener('DOMContentLoaded', () => {
   function addItemRow(item = {}) {
     const row = document.createElement('div');
     row.className = 'item-row';
-    row.innerHTML = `<span class="item-number"></span><input class="item-name" placeholder="Item name" value="${escapeAttribute(item.name || '')}"><div class="item-quantity-wrap"><input class="item-quantity" type="number" min="0" step="any" placeholder="Qty" value="${item.quantity ?? ''}"><select class="item-unit" aria-label="Unit of quantity"><option value="Kg" ${((item.unit || 'Kg') === 'Kg') ? 'selected' : ''}>Kg</option><option value="Pkgs" ${((item.unit || 'Kg') === 'Pkgs') ? 'selected' : ''}>Pkgs</option><option value="Pcs" ${((item.unit || 'Kg') === 'Pcs') ? 'selected' : ''}>Pcs</option></select></div><input class="item-quote" type="number" min="0" step="any" placeholder="Rate" value="${item.quotePrice ?? ''}"><input class="item-price" type="number" readonly placeholder="0.00"><span class="item-actions"><button type="button" class="remove-item" title="Remove item" aria-label="Remove item">&times;</button></span>`;
+    const quantityValue = item.unit === '-' && Number(item.quantity) === 1 ? '-' : (item.quantity ?? '');
+    row.innerHTML = `<span class="item-number"></span><input class="item-name" placeholder="Item name" value="${escapeAttribute(item.name || '')}"><div class="item-quantity-wrap"><input class="item-quantity" type="text" inputmode="decimal" list="quantityOptions" placeholder="Qty" value="${quantityValue}"><select class="item-unit" aria-label="Unit of quantity"><option value="Kg" ${((item.unit || 'Kg') === 'Kg') ? 'selected' : ''}>Kg</option><option value="Pkgs" ${((item.unit || 'Kg') === 'Pkgs') ? 'selected' : ''}>Pkgs</option><option value="Pcs" ${((item.unit || 'Kg') === 'Pcs') ? 'selected' : ''}>Pcs</option><option value="-" ${item.unit === '-' ? 'selected' : ''}>-</option></select></div><input class="item-quote" type="number" min="0" step="any" placeholder="Rate" value="${item.quotePrice ?? ''}"><input class="item-price" type="number" readonly placeholder="0.00"><span class="item-actions"><button type="button" class="remove-item" title="Remove item" aria-label="Remove item">&times;</button></span>`;
     row.querySelectorAll('input, select').forEach(control => {
       control.addEventListener('input', recalcTotal);
       control.addEventListener('change', recalcTotal);
+    });
+    row.querySelector('.item-unit').addEventListener('change', event => {
+      if (event.target.value === '-') row.querySelector('.item-quantity').value = '-';
+      recalcTotal();
     });
     row.querySelector('.remove-item').addEventListener('click', () => {
       if (tablesContainer.children.length > 1) row.remove();
@@ -129,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function recalcTotal() {
     let total = 0;
     tablesContainer.querySelectorAll('.item-row').forEach(row => {
-      const quantity = Number(row.querySelector('.item-quantity').value);
+      const quantity = parseQuantity(row.querySelector('.item-quantity').value);
       const quotePrice = Number(row.querySelector('.item-quote').value);
       const price = Number.isFinite(quantity) && Number.isFinite(quotePrice) && quantity >= 0 && quotePrice >= 0 ? quantity * quotePrice : 0;
       row.querySelector('.item-price').value = price.toFixed(2);
@@ -143,6 +148,10 @@ document.addEventListener('DOMContentLoaded', () => {
     amountWords.value = numberToWords(Math.round(total));
   }
 
+  function parseQuantity(value) {
+    return value.trim() === '-' ? 1 : Number(value);
+  }
+
   function readItems() {
     const items = [];
     let invalid = false;
@@ -152,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const quantityUnit = row.querySelector('.item-unit')?.value || 'Kg';
       const quoteRaw = row.querySelector('.item-quote').value.trim();
       if (!name && !quantityRaw && !quoteRaw) return;
-      const quantity = Number(quantityRaw);
+      const quantity = parseQuantity(quantityRaw);
       const quotePrice = Number(quoteRaw);
       if (!name || !quantityRaw || !quoteRaw || !Number.isFinite(quantity) || !Number.isFinite(quotePrice) || quantity < 0 || quotePrice < 0) invalid = true;
       items.push({ sNo: index + 1, name, quantity, unit: quantityUnit, quotePrice, price: quantity * quotePrice });
@@ -354,7 +363,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const items = invoice.items || [];
     const total = Number(invoice.total || invoice.totals?.grand || 0).toFixed(2);
     const invoiceNumber = invoice.invoiceNumber || getNextInvoiceId();
-    const rows = items.map((item, index) => `<tr><td>${index + 1}</td><td>${escapeHtml(item.name)}</td><td class="number">${Number(item.quantity).toFixed(2)} ${escapeHtml(item.unit || 'Kg')}</td><td class="number">₹ ${Number(item.quotePrice).toFixed(2)}</td><td class="number">₹ ${Number(item.price).toFixed(2)}</td></tr>`).join('');
+    const rows = items.map((item, index) => { const quantityDisplay = item.unit === '-' ? '-' : `${Number(item.quantity).toFixed(2)} ${escapeHtml(item.unit || 'Kg')}`; return `<tr><td>${index + 1}</td><td>${escapeHtml(item.name)}</td><td class="number">${quantityDisplay}</td><td class="number">₹ ${Number(item.quotePrice).toFixed(2)}</td><td class="number">₹ ${Number(item.price).toFixed(2)}</td></tr>`; }).join('');
     return `<!doctype html><html><head><meta charset="utf-8"><title>Invoice ${escapeHtml(invoiceNumber)}</title><style>@page{size:A4;margin:12mm}*{box-sizing:border-box}body{margin:0;color:#172033;font:13px Montserrat,'Segoe UI',sans-serif}.invoice{max-width:190mm;margin:auto}.header{display:flex;justify-content:space-between;gap:20px;border-bottom:3px solid #d9902f;padding-bottom:14px}.brand{display:flex;gap:12px;align-items:center}.logo{width:64px;height:64px;border-radius:50%;object-fit:cover}.company h1{margin:0 0 4px;font-size:20px;letter-spacing:1px}.company p{margin:3px 0;color:#657083;font-size:11px}.meta{text-align:right;color:#657083}.meta strong{display:block;color:#172033;font-size:15px;margin-bottom:8px}.bill-to{display:flex;justify-content:space-between;margin:22px 0 16px;padding:12px;background:#f5f7f9;border-left:4px solid #d9902f}.bill-to span{display:block;color:#657083;font-size:10px;text-transform:uppercase}.bill-to strong{font-size:16px}.items{width:100%;border-collapse:collapse}.items th{background:#172033;color:#fff}.items th,.items td{padding:10px 9px;border-bottom:1px solid #dce1e8;text-align:left}.items .number{text-align:right;font-variant-numeric:tabular-nums}.items tfoot td{font-weight:700;background:#f5f7f9}.summary{display:flex;justify-content:space-between;gap:20px;margin-top:22px;padding:14px;background:#f5f7f9}.grand{font-size:17px;font-weight:700}.grand .dues{display:block;font-size:13px;font-weight:600;color:#657083;margin-bottom:5px}.grand strong{display:block;font-size:21px}.words{max-width:55%;color:#657083}.words strong{display:block;color:#172033;margin-bottom:5px}.signature{text-align:right;margin-top:48px;font-weight:700}.signature span{display:block;border-top:2px solid #172033;padding-top:7px}.footer{text-align:center;color:#657083;margin-top:28px;font-size:15px;font-weight:600}@media print{.invoice{max-width:none}.items{break-inside:avoid}.summary{break-inside:avoid}}</style></head><body><main class="invoice"><header class="header"><div class="brand"><img class="logo" src="${new URL('../Assets/logo.png', window.location.href).href}" alt="Logo"><div class="company"><h1>Shankar Vegetable Shop</h1><p>Gamharia Market Complex • 832108</p><p>Phone: 8210945932</p></div></div><div class="meta"><strong>Invoice No. #${escapeHtml(invoice.invoiceId || invoice.invoiceNumber || '')}</strong><div>${escapeHtml(invoice.dateText || invoice.billingDate || '')}</div></div></header><section class="bill-to"><div><span>Bill To</span><strong>${escapeHtml(invoice.customerName || 'Customer')}</strong></div><div><span>Bill of Date</span><strong>${escapeHtml(invoice.dateText || invoice.billingDate || '')}</strong></div></section><table class="items"><thead><tr><th>S.No</th><th>Item</th><th class="number">Qty / Unit</th><th class="number">Rate</th><th class="number">Price</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><td colspan="4">Total Amount</td><td class="number">₹ ${total}</td></tr></tfoot></table><section class="summary"><div class="grand"><span class="dues">Previous Dues: ₹ ${Number(invoice.previousDues || 0).toFixed(2)}</span><strong>Total Amount: ₹ ${total}</strong></div><div class="words"><strong>Total Amount in Words</strong>${escapeHtml(invoice.totalWords || '')}</div></section><div class="signature"><span>Shankar Vegetable Shop</span></div><div class="footer">Thank You &amp; Visit Us Again.</div></main></body></html>`;
   }
 
